@@ -1,0 +1,20 @@
+networkNames={'DorsAttn','VentAttn','Limbic','SomMot','Default','Cont','_Vis_','All'};
+
+meanAll=nan(2,8);
+stdAll=nan(2,8);
+
+for ii= 1:8
+    if(ii==8)
+        currNetwork=true(1,length(NetworkDataGeneral.Schaefer400x7.LUT.Label_Name2));
+    else
+        currNetwork=contains(NetworkDataGeneral.Schaefer400x7.LUT.Label_Name2,networkNames{ii})';
+    end
+
+
+networkNames(ii)
+yesdata=thickyesChange(:,currNetwork),'omitnan');
+nodata=thicknoChange(:,currNetwork),'omitnan');
+meanAll(1,ii)=mean(mean();
+meanAll(2,ii)=mean(mean();
+
+end

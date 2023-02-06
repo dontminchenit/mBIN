@@ -1,0 +1,449 @@
+Label.ID,Label.Name,R,G,B,Flag,FreeSurferLabel,Label.Number,Label.AbbrevName,Label.FullName,Label.Hemisphere,Label.Lobe,Label.Cortex,TissueClass,Label.RegionName
+1,right-lateralorbitofrontal_1,247,255,0,0,65527,26,R ofc,Right ofc,Right,NA,TRUE,2,ofc
+2,right-lateralorbitofrontal_2,45,255,0,0,65325,NA,,,,NA,NA,NA,NA
+3,right-lateralorbitofrontal_3,57,255,0,0,65337,NA,,,,NA,NA,NA,NA
+4,right-lateralorbitofrontal_4,0,255,133,0,8781568,26,R ofc,Right ofc,Right,NA,TRUE,2,ofc
+5,right-lateralorbitofrontal_5,0,96,255,0,16736256,NA,,,,NA,NA,NA,NA
+6,right-lateralorbitofrontal_6,0,90,255,0,16734720,NA,,,,NA,NA,NA,NA
+7,right-lateralorbitofrontal_7,255,0,147,0,9634047,NA,,,,NA,NA,NA,NA
+8,right-parsorbitalis_1,255,18,0,0,4863,20,R iPFC,Right ipfg,Right,NA,TRUE,2,ipfg
+9,right-parsorbitalis_2,255,0,86,0,5636351,20,R iPFC,Right ipfg,Right,NA,TRUE,2,ipfg
+10,right-frontalpole_1,222,255,0,0,65502,NA,,,,NA,NA,NA,NA
+11,right-medialorbitofrontal_1,143,0,255,0,16711823,NA,,,,NA,NA,NA,NA
+12,right-medialorbitofrontal_2,255,239,0,0,61439,NA,,,,NA,NA,NA,NA
+13,right-medialorbitofrontal_3,247,0,255,0,16711927,26,R ofc,Right ofc,Right,NA,TRUE,2,ofc
+14,right-medialorbitofrontal_4,0,78,255,0,16731648,26,R ofc,Right ofc,Right,NA,TRUE,2,ofc
+15,right-medialorbitofrontal_5,0,188,255,0,16759808,26,R ofc,Right ofc,Right,NA,TRUE,2,ofc
+16,right-parstriangularis_1,241,255,0,0,65521,16,R IFC,Right ifg,Right,NA,TRUE,2,ifg
+17,right-parstriangularis_2,0,255,237,0,15597312,16,R IFC,Right ifg,Right,NA,TRUE,2,ifg
+18,right-parstriangularis_3,255,0,177,0,11600127,16,R IFC,Right ifg,Right,NA,TRUE,2,ifg
+19,right-parstriangularis_4,255,177,0,0,45567,16,R IFC,Right ifg,Right,NA,TRUE,2,ifg
+20,right-parsopercularis_1,69,0,255,0,16711749,16,R IFC,Right ifg,Right,NA,TRUE,2,ifg
+21,right-parsopercularis_2,255,0,129,0,8454399,16,R IFC,Right ifg,Right,NA,TRUE,2,ifg
+22,right-parsopercularis_3,210,0,255,0,16711890,16,R IFC,Right ifg,Right,NA,TRUE,2,ifg
+23,right-parsopercularis_4,0,255,139,0,9174784,16,R IFC,Right ifg,Right,NA,TRUE,2,ifg
+24,right-rostralmiddlefrontal_1,0,53,255,0,16725248,NA,,,,NA,NA,NA,NA
+25,right-rostralmiddlefrontal_2,0,255,114,0,7536384,22,R mfc,Right mfc,Right,NA,TRUE,2,mfc
+26,right-rostralmiddlefrontal_3,255,0,239,0,15663359,NA,,,,NA,NA,NA,NA
+27,right-rostralmiddlefrontal_4,255,0,239,0,15663359,22,R mfc,Right mfc,Right,NA,TRUE,2,mfc
+28,right-rostralmiddlefrontal_5,255,0,239,0,15663359,NA,,,,NA,NA,NA,NA
+29,right-rostralmiddlefrontal_6,255,104,0,0,26879,10,R dlpfc,Right dlpfc,Right,NA,TRUE,2,dlpfc
+30,right-rostralmiddlefrontal_7,255,0,214,0,14024959,10,R dlpfc,Right dlpfc,Right,NA,TRUE,2,dlpfc
+31,right-rostralmiddlefrontal_8,14,0,255,0,16711694,10,R dlpfc,Right dlpfc,Right,NA,TRUE,2,dlpfc
+32,right-rostralmiddlefrontal_9,0,255,126,0,8322816,10,R dlpfc,Right dlpfc,Right,NA,TRUE,2,dlpfc
+33,right-rostralmiddlefrontal_10,255,0,122,0,7995647,10,R dlpfc,Right dlpfc,Right,NA,TRUE,2,dlpfc
+34,right-rostralmiddlefrontal_11,186,255,0,0,65466,NA,,,,NA,NA,NA,NA
+35,right-rostralmiddlefrontal_12,0,255,255,0,16776960,10,R dlpfc,Right dlpfc,Right,NA,TRUE,2,dlpfc
+36,right-rostralmiddlefrontal_13,235,0,255,0,16711915,NA,,,,NA,NA,NA,NA
+37,right-superiorfrontal_1,255,0,251,0,16449791,NA,,,,NA,NA,NA,NA
+38,right-superiorfrontal_2,0,84,255,0,16733184,NA,,,,NA,NA,NA,NA
+39,right-superiorfrontal_3,0,231,255,0,16770816,NA,,,,NA,NA,NA,NA
+40,right-superiorfrontal_4,0,169,255,0,16754944,NA,,,,NA,NA,NA,NA
+41,right-superiorfrontal_5,0,255,22,0,1507072,NA,,,,NA,NA,NA,NA
+42,right-superiorfrontal_6,0,126,255,0,16743936,NA,,,,NA,NA,NA,NA
+43,right-superiorfrontal_7,100,255,0,0,65380,NA,,,,NA,NA,NA,NA
+44,right-superiorfrontal_8,0,157,255,0,16751872,NA,,,,NA,NA,NA,NA
+45,right-superiorfrontal_9,39,0,255,0,16711719,NA,,,,NA,NA,NA,NA
+46,right-superiorfrontal_10,0,71,255,0,16729856,NA,,,,NA,NA,NA,NA
+47,right-superiorfrontal_11,255,0,220,0,14418175,NA,,,,NA,NA,NA,NA
+48,right-superiorfrontal_12,143,255,0,0,65423,NA,,,,NA,NA,NA,NA
+49,right-superiorfrontal_13,0,255,96,0,6356736,NA,,,,NA,NA,NA,NA
+50,right-superiorfrontal_14,0,65,255,0,16728320,NA,,,,NA,NA,NA,NA
+51,right-superiorfrontal_15,255,0,208,0,13631743,NA,,,,NA,NA,NA,NA
+52,right-superiorfrontal_16,0,218,255,0,16767488,NA,,,,NA,NA,NA,NA
+53,right-superiorfrontal_17,255,67,0,0,17407,NA,,,,NA,NA,NA,NA
+54,right-caudalmiddlefrontal_1,0,255,145,0,9568000,NA,,,,NA,NA,NA,NA
+55,right-caudalmiddlefrontal_2,8,255,0,0,65288,NA,,,,NA,NA,NA,NA
+56,right-caudalmiddlefrontal_3,255,0,153,0,10027263,NA,,,,NA,NA,NA,NA
+57,right-caudalmiddlefrontal_4,63,0,255,0,16711743,22,R mfc,Right mfc,Right,NA,TRUE,2,mfc
+58,right-caudalmiddlefrontal_5,235,255,0,0,65515,NA,,,,NA,NA,NA,NA
+59,right-precentral_1,124,0,255,0,16711804,NA,,,,NA,NA,NA,NA
+60,right-precentral_2,63,255,0,0,65343,NA,,,,NA,NA,NA,NA
+61,right-precentral_3,255,0,98,0,6422783,NA,,,,NA,NA,NA,NA
+62,right-precentral_4,45,0,255,0,16711725,NA,,,,NA,NA,NA,NA
+63,right-precentral_5,0,47,255,0,16723712,32,R precg,Right precg,Right,NA,TRUE,2,precg
+64,right-precentral_6,0,255,169,0,11140864,NA,,,,NA,NA,NA,NA
+65,right-precentral_7,255,0,226,0,14811391,NA,,,,NA,NA,NA,NA
+66,right-precentral_8,255,159,0,0,40959,32,R precg,Right precg,Right,NA,TRUE,2,precg
+67,right-precentral_9,216,0,255,0,16711896,32,R precg,Right precg,Right,NA,TRUE,2,precg
+68,right-precentral_10,255,24,0,0,6399,32,R precg,Right precg,Right,NA,TRUE,2,precg
+69,right-precentral_11,228,0,255,0,16711908,NA,,,,NA,NA,NA,NA
+70,right-precentral_12,180,255,0,0,65460,32,R precg,Right precg,Right,NA,TRUE,2,precg
+71,right-precentral_13,255,153,0,0,39423,NA,,,,NA,NA,NA,NA
+72,right-precentral_14,14,255,0,0,65294,NA,,,,NA,NA,NA,NA
+73,right-precentral_15,0,206,255,0,16764416,NA,,,,NA,NA,NA,NA
+74,right-precentral_16,0,108,255,0,16739328,NA,,,,NA,NA,NA,NA
+75,right-paracentral_1,0,255,231,0,15204096,NA,,,,NA,NA,NA,NA
+76,right-paracentral_2,204,255,0,0,65484,NA,,,,NA,NA,NA,NA
+77,right-paracentral_3,33,0,255,0,16711713,NA,,,,NA,NA,NA,NA
+78,right-paracentral_4,210,255,0,0,65490,NA,,,,NA,NA,NA,NA
+79,right-paracentral_5,75,0,255,0,16711755,NA,,,,NA,NA,NA,NA
+80,right-paracentral_6,255,141,0,0,36351,NA,,,,NA,NA,NA,NA
+81,right-rostralanteriorcingulate_1,173,255,0,0,65453,NA,,,,NA,NA,NA,NA
+82,right-rostralanteriorcingulate_2,131,0,255,0,16711811,2,R aCING,Right acc,Right,NA,TRUE,2,acc
+83,right-caudalanteriorcingulate_1,0,35,255,0,16720640,2,R aCING,Right acc,Right,NA,TRUE,2,acc
+84,right-caudalanteriorcingulate_2,112,0,255,0,16711792,2,R aCING,Right acc,Right,NA,TRUE,2,acc
+85,right-caudalanteriorcingulate_3,255,226,0,0,58111,NA,,,,NA,NA,NA,NA
+86,right-posteriorcingulate_1,0,10,255,0,16714240,NA,R pCING,,,NA,NA,NA,NA
+87,right-posteriorcingulate_2,149,0,255,0,16711829,NA,R pCING,,,NA,NA,NA,NA
+88,right-posteriorcingulate_3,192,255,0,0,65472,NA,R pCING,,,NA,NA,NA,NA
+89,right-posteriorcingulate_4,192,0,255,0,16711872,NA,R pCING,,,NA,NA,NA,NA
+90,right-isthmuscingulate_1,255,129,0,0,33279,28,R pcc,Right pcc,Right,NA,TRUE,2,pcc
+91,right-isthmuscingulate_2,0,163,255,0,16753408,28,R pcc,Right pcc,Right,NA,TRUE,2,pcc
+92,right-postcentral_1,27,0,255,0,16711707,NA,,,,NA,NA,NA,NA
+93,right-postcentral_2,131,255,0,0,65411,NA,,,,NA,NA,NA,NA
+94,right-postcentral_3,0,255,206,0,13565696,NA,,,,NA,NA,NA,NA
+95,right-postcentral_4,228,255,0,0,65508,NA,,,,NA,NA,NA,NA
+96,right-postcentral_5,20,0,255,0,16711700,30,R pocg,Right pocg,Right,NA,TRUE,2,pocg
+97,right-postcentral_6,255,110,0,0,28415,30,R pocg,Right pocg,Right,NA,TRUE,2,pocg
+98,right-postcentral_7,255,233,0,0,59903,30,R pocg,Right pocg,Right,NA,TRUE,2,pocg
+99,right-postcentral_8,0,29,255,0,16719104,30,R pocg,Right pocg,Right,NA,TRUE,2,pocg
+100,right-postcentral_9,155,0,255,0,16711835,30,R pocg,Right pocg,Right,NA,TRUE,2,pocg
+101,right-postcentral_10,155,255,0,0,65435,30,R pocg,Right pocg,Right,NA,TRUE,2,pocg
+102,right-postcentral_11,0,255,78,0,5177088,30,R pocg,Right pocg,Right,NA,TRUE,2,pocg
+103,right-postcentral_12,39,255,0,0,65319,NA,,,,NA,NA,NA,NA
+104,right-supramarginal_1,255,122,0,0,31487,NA,,,,NA,NA,NA,NA
+105,right-supramarginal_2,0,255,71,0,4718336,NA,,,,NA,NA,NA,NA
+106,right-supramarginal_3,0,255,53,0,3538688,NA,,,,NA,NA,NA,NA
+107,right-supramarginal_4,255,135,0,0,34815,NA,,,,NA,NA,NA,NA
+108,right-supramarginal_5,255,0,141,0,9240831,NA,,,,NA,NA,NA,NA
+109,right-supramarginal_6,0,212,255,0,16765952,NA,,,,NA,NA,NA,NA
+110,right-supramarginal_7,0,255,188,0,12386048,NA,,,,NA,NA,NA,NA
+111,right-supramarginal_8,255,37,0,0,9727,NA,,,,NA,NA,NA,NA
+112,right-supramarginal_9,255,12,0,0,3327,NA,,,,NA,NA,NA,NA
+113,right-superiorparietal_1,255,116,0,0,29951,NA,,,,NA,NA,NA,NA
+114,right-superiorparietal_2,255,245,0,0,62975,36,R SPC,Right spl,Right,NA,TRUE,2,spl
+115,right-superiorparietal_3,255,208,0,0,53503,36,R SPC,Right spl,Right,NA,TRUE,2,spl
+116,right-superiorparietal_4,0,59,255,0,16726784,36,R SPC,Right spl,Right,NA,TRUE,2,spl
+117,right-superiorparietal_5,69,255,0,0,65349,36,R SPC,Right spl,Right,NA,TRUE,2,spl
+118,right-superiorparietal_6,94,255,0,0,65374,36,R SPC,Right spl,Right,NA,TRUE,2,spl
+119,right-superiorparietal_7,57,0,255,0,16711737,NA,,,,NA,NA,NA,NA
+120,right-superiorparietal_8,0,182,255,0,16758272,36,R SPC,Right spl,Right,NA,TRUE,2,spl
+121,right-superiorparietal_9,118,255,0,0,65398,NA,,,,NA,NA,NA,NA
+122,right-superiorparietal_10,8,0,255,0,16711688,NA,,,,NA,NA,NA,NA
+123,right-superiorparietal_11,82,255,0,0,65362,NA,,,,NA,NA,NA,NA
+124,right-superiorparietal_12,186,0,255,0,16711866,NA,,,,NA,NA,NA,NA
+125,right-superiorparietal_13,255,80,0,0,20735,NA,,,,NA,NA,NA,NA
+126,right-inferiorparietal_1,216,255,0,0,65496,NA,,,,NA,NA,NA,NA
+127,right-inferiorparietal_2,112,255,0,0,65392,4,R ang,Right ang,Right,NA,TRUE,2,ang
+128,right-inferiorparietal_3,255,0,110,0,7209215,NA,,,,NA,NA,NA,NA
+129,right-inferiorparietal_4,51,255,0,0,65331,4,R ang,Right ang,Right,NA,TRUE,2,ang
+130,right-inferiorparietal_5,241,0,255,0,16711921,4,R ang,Right ang,Right,NA,TRUE,2,ang
+131,right-inferiorparietal_6,255,214,0,0,55039,NA,,,,NA,NA,NA,NA
+132,right-inferiorparietal_7,33,255,0,0,65313,4,R ang,Right ang,Right,NA,TRUE,2,ang
+133,right-inferiorparietal_8,0,255,102,0,6749952,4,R ang,Right ang,Right,NA,TRUE,2,ang
+134,right-inferiorparietal_9,255,49,0,0,12799,4,R ang,Right ang,Right,NA,TRUE,2,ang
+135,right-inferiorparietal_10,255,202,0,0,51967,NA,,,,NA,NA,NA,NA
+136,right-inferiorparietal_11,255,0,184,0,12058879,NA,,,,NA,NA,NA,NA
+137,right-inferiorparietal_12,118,0,255,0,16711798,NA,,,,NA,NA,NA,NA
+138,right-precuneus_1,255,190,0,0,48895,NA,,,,NA,NA,NA,NA
+139,right-precuneus_2,0,255,249,0,16383744,6,R calcarine,Right calcarine,Right,NA,TRUE,2,calcarine
+140,right-precuneus_3,0,237,255,0,16772352,NA,,,,NA,NA,NA,NA
+141,right-precuneus_4,0,243,255,0,16773888,NA,,,,NA,NA,NA,NA
+142,right-precuneus_5,255,196,0,0,50431,NA,,,,NA,NA,NA,NA
+143,right-precuneus_6,255,55,0,0,14335,NA,,,,NA,NA,NA,NA
+144,right-precuneus_7,0,22,255,0,16717312,NA,,,,NA,NA,NA,NA
+145,right-precuneus_8,255,147,0,0,37887,NA,,,,NA,NA,NA,NA
+146,right-precuneus_9,222,0,255,0,16711902,34,R precuneus,Right precuneus,Right,NA,TRUE,2,precuneus
+147,right-precuneus_10,0,249,255,0,16775424,34,R precuneus,Right precuneus,Right,NA,TRUE,2,precuneus
+148,right-cuneus_1,88,255,0,0,65368,6,R calcarine,Right calcarine,Right,NA,TRUE,2,calcarine
+149,right-cuneus_2,255,0,165,0,10813695,NA,,,,NA,NA,NA,NA
+150,right-cuneus_3,149,255,0,0,65429,NA,,,,NA,NA,NA,NA
+151,right-cuneus_4,0,255,182,0,11992832,NA,,,,NA,NA,NA,NA
+152,right-pericalcarine_1,124,255,0,0,65404,6,R calcarine,Right calcarine,Right,NA,TRUE,2,calcarine
+153,right-pericalcarine_2,198,0,255,0,16711878,6,R calcarine,Right calcarine,Right,NA,TRUE,2,calcarine
+154,right-pericalcarine_3,255,251,0,0,64511,6,R calcarine,Right calcarine,Right,NA,TRUE,2,calcarine
+155,right-pericalcarine_4,255,0,245,0,16056575,NA,,,,NA,NA,NA,NA
+156,right-lateraloccipital_1,255,0,0,0,255,NA,,,,NA,NA,NA,NA
+157,right-lateraloccipital_2,255,31,0,0,8191,NA,,,,NA,NA,NA,NA
+158,right-lateraloccipital_3,255,0,135,0,8847615,NA,,,,NA,NA,NA,NA
+159,right-lateraloccipital_4,255,0,116,0,7602431,NA,,,,NA,NA,NA,NA
+160,right-lateraloccipital_5,0,255,218,0,14352128,NA,,,,NA,NA,NA,NA
+161,right-lateraloccipital_6,253,255,0,0,65533,NA,,,,NA,NA,NA,NA
+162,right-lateraloccipital_7,167,255,0,0,65447,NA,,,,NA,NA,NA,NA
+163,right-lateraloccipital_8,204,0,255,0,16711884,NA,,,,NA,NA,NA,NA
+164,right-lateraloccipital_9,255,165,0,0,42495,NA,,,,NA,NA,NA,NA
+165,right-lateraloccipital_10,2,255,0,0,65282,NA,,,,NA,NA,NA,NA
+166,right-lingual_1,161,255,0,0,65441,NA,,,,NA,NA,NA,NA
+167,right-lingual_2,255,0,233,0,15270143,NA,,,,NA,NA,NA,NA
+168,right-lingual_3,255,86,0,0,22271,6,R calcarine,Right calcarine,Right,NA,TRUE,2,calcarine
+169,right-lingual_4,198,255,0,0,65478,NA,,,,NA,NA,NA,NA
+170,right-lingual_5,0,200,255,0,16762880,NA,,,,NA,NA,NA,NA
+171,right-lingual_6,0,255,47,0,3145472,6,R calcarine,Right calcarine,Right,NA,TRUE,2,calcarine
+172,right-lingual_7,0,255,120,0,7929600,6,R calcarine,Right calcarine,Right,NA,TRUE,2,calcarine
+173,right-fusiform_1,0,41,255,0,16722176,NA,,,,NA,NA,NA,NA
+174,right-fusiform_2,0,114,255,0,16740864,NA,,,,NA,NA,NA,NA
+175,right-fusiform_3,255,43,0,0,11263,NA,,,,NA,NA,NA,NA
+176,right-fusiform_4,0,255,35,0,2359040,NA,,,,NA,NA,NA,NA
+177,right-fusiform_5,106,0,255,0,16711786,NA,,,,NA,NA,NA,NA
+178,right-fusiform_6,255,220,0,0,56575,NA,,,,NA,NA,NA,NA
+179,right-fusiform_7,0,194,255,0,16761344,NA,,,,NA,NA,NA,NA
+180,right-fusiform_8,255,0,92,0,6029567,NA,,,,NA,NA,NA,NA
+181,right-parahippocampal_1,0,175,255,0,16756480,NA,,,,NA,NA,NA,NA
+182,right-parahippocampal_2,0,151,255,0,16750336,NA,,,,NA,NA,NA,NA
+183,right-parahippocampal_3,0,255,59,0,3931904,NA,,,,NA,NA,NA,NA
+184,right-entorhinal_1,0,255,16,0,1113856,12,R HIP,Right entorhinal,Right,NA,TRUE,2,entorhinal
+185,right-temporalpole_1,255,73,0,0,18943,40,R temppole,Right temppole,Right,NA,TRUE,2,temppole
+186,right-inferiortemporal_1,0,255,224,0,14745344,44,R aITC,Right vlt,Right,NA,TRUE,2,vlt
+187,right-inferiortemporal_2,0,139,255,0,16747264,44,R aITC,Right vlt,Right,NA,TRUE,2,vlt
+188,right-inferiortemporal_3,253,0,255,0,16711933,NA,,,,NA,NA,NA,NA
+189,right-inferiortemporal_4,51,0,255,0,16711731,NA,,,,NA,NA,NA,NA
+190,right-inferiortemporal_5,0,255,194,0,12779264,NA,,,,NA,NA,NA,NA
+191,right-inferiortemporal_6,106,255,0,0,65386,NA,,,,NA,NA,NA,NA
+192,right-inferiortemporal_7,0,224,255,0,16769024,NA,,,,NA,NA,NA,NA
+193,right-middletemporal_1,255,184,0,0,47359,NA,,,,NA,NA,NA,NA
+194,right-middletemporal_2,0,255,175,0,11534080,NA,,,,NA,NA,NA,NA
+195,right-middletemporal_3,255,61,0,0,15871,NA,,,,NA,NA,NA,NA
+196,right-middletemporal_4,0,4,255,0,16712704,NA,,,,NA,NA,NA,NA
+197,right-middletemporal_5,255,0,171,0,11206911,24,R mtg,Right mtg,Right,NA,TRUE,2,mtg
+198,right-middletemporal_6,0,255,157,0,10354432,NA,,,,NA,NA,NA,NA
+199,right-middletemporal_7,255,6,0,0,1791,24,R mtg,Right mtg,Right,NA,TRUE,2,mtg
+200,right-middletemporal_8,2,0,255,0,16711682,24,R mtg,Right mtg,Right,NA,TRUE,2,mtg
+201,right-middletemporal_9,82,0,255,0,16711762,NA,,,,NA,NA,NA,NA
+202,right-bankssts_1,255,0,104,0,6815999,NA,,,,NA,NA,NA,NA
+203,right-bankssts_2,0,255,29,0,1965824,NA,,,,NA,NA,NA,NA
+204,right-bankssts_3,255,0,159,0,10420479,46,R wernicke,Right wernicke,Right,NA,TRUE,2,wernicke
+205,right-superiortemporal_1,0,255,108,0,7143168,46,R wernicke,Right wernicke,Right,NA,TRUE,2,wernicke
+206,right-superiortemporal_2,0,255,90,0,5963520,46,R wernicke,Right wernicke,Right,NA,TRUE,2,wernicke
+207,right-superiortemporal_3,75,255,0,0,65355,NA,,,,NA,NA,NA,NA
+208,right-superiortemporal_4,0,133,255,0,16745728,NA,,,,NA,NA,NA,NA
+209,right-superiortemporal_5,0,255,163,0,10747648,38,R SMTC,Right stg,Right,NA,TRUE,2,stg
+210,right-superiortemporal_6,100,0,255,0,16711780,38,R SMTC,Right stg,Right,NA,TRUE,2,stg
+211,right-superiortemporal_7,27,255,0,0,65307,38,R SMTC,Right stg,Right,NA,TRUE,2,stg
+212,right-superiortemporal_8,255,0,196,0,12845311,38,R SMTC,Right stg,Right,NA,TRUE,2,stg
+213,right-superiortemporal_9,180,0,255,0,16711860,38,R SMTC,Right stg,Right,NA,TRUE,2,stg
+214,right-superiortemporal_10,0,255,212,0,13958912,NA,,,,NA,NA,NA,NA
+215,right-superiortemporal_11,0,145,255,0,16748800,NA,,,,NA,NA,NA,NA
+216,right-transversetemporal_1,0,255,65,0,4325120,NA,,,,NA,NA,NA,NA
+217,right-insula_1,167,0,255,0,16711847,NA,,,,NA,NA,NA,NA
+218,right-insula_2,0,255,10,0,720640,NA,,,,NA,NA,NA,NA
+219,right-insula_3,137,0,255,0,16711817,18,R aINS,Right insula,Right,NA,TRUE,2,insula
+220,right-insula_4,255,92,0,0,23807,18,R aINS,Right insula,Right,NA,TRUE,2,insula
+221,right-insula_5,0,120,255,0,16742400,18,R aINS,Right insula,Right,NA,TRUE,2,insula
+222,right-insula_6,0,255,200,0,13172480,18,R aINS,Right insula,Right,NA,TRUE,2,insula
+223,right-insula_7,0,255,84,0,5570304,18,R aINS,Right insula,Right,NA,TRUE,2,insula
+231,left-lateralorbitofrontal_1,247,255,0,0,65527,25,L ofc,Left ofc,Left,NA,TRUE,2,ofc
+232,left-lateralorbitofrontal_2,45,255,0,0,65325,25,L ofc,Left ofc,Left,NA,TRUE,2,ofc
+233,left-lateralorbitofrontal_3,57,255,0,0,65337,NA,,,,NA,NA,NA,NA
+234,left-lateralorbitofrontal_4,0,255,133,0,8781568,NA,,,,NA,NA,NA,NA
+235,left-lateralorbitofrontal_5,0,96,255,0,16736256,NA,,,,NA,NA,NA,NA
+236,left-lateralorbitofrontal_6,0,90,255,0,16734720,NA,,,,NA,NA,NA,NA
+237,left-lateralorbitofrontal_7,255,0,147,0,9634047,NA,,,,NA,NA,NA,NA
+238,left-parsorbitalis_1,255,18,0,0,4863,19,L iPFC,Left ipfg,Left,NA,TRUE,2,ipfg
+239,left-parsorbitalis_2,255,0,86,0,5636351,19,L iPFC,Left ipfg,Left,NA,TRUE,2,ipfg
+240,left-frontalpole_1,222,255,0,0,65502,NA,,,,NA,NA,NA,NA
+241,left-medialorbitofrontal_1,143,0,255,0,16711823,NA,,,,NA,NA,NA,NA
+242,left-medialorbitofrontal_2,255,239,0,0,61439,NA,,,,NA,NA,NA,NA
+243,left-medialorbitofrontal_3,247,0,255,0,16711927,25,L ofc,Left ofc,Left,NA,TRUE,2,ofc
+244,left-medialorbitofrontal_4,0,78,255,0,16731648,25,L ofc,Left ofc,Left,NA,TRUE,2,ofc
+245,left-medialorbitofrontal_5,0,188,255,0,16759808,25,L ofc,Left ofc,Left,NA,TRUE,2,ofc
+246,left-parstriangularis_1,241,255,0,0,65521,15,L IFC,Left ifg,Left,NA,TRUE,2,ifg
+247,left-parstriangularis_2,0,255,237,0,15597312,15,L IFC,Left ifg,Left,NA,TRUE,2,ifg
+248,left-parstriangularis_3,255,0,177,0,11600127,15,L IFC,Left ifg,Left,NA,TRUE,2,ifg
+249,left-parsopercularis_1,69,0,255,0,16711749,15,L IFC,Left ifg,Left,NA,TRUE,2,ifg
+250,left-parsopercularis_2,255,0,129,0,8454399,15,L IFC,Left ifg,Left,NA,TRUE,2,ifg
+251,left-parsopercularis_3,210,0,255,0,16711890,15,L IFC,Left ifg,Left,NA,TRUE,2,ifg
+252,left-parsopercularis_4,0,255,139,0,9174784,15,L IFC,Left ifg,Left,NA,TRUE,2,ifg
+253,left-rostralmiddlefrontal_1,0,53,255,0,16725248,NA,,,,NA,NA,NA,NA
+254,left-rostralmiddlefrontal_2,0,255,114,0,7536384,21,L mfc,Left mfc,Left,NA,TRUE,2,mfc
+255,left-rostralmiddlefrontal_3,255,0,239,0,15663359,21,L mfc,Left mfc,Left,NA,TRUE,2,mfc
+256,left-rostralmiddlefrontal_4,255,0,239,0,15663359,NA,,,,NA,NA,NA,NA
+257,left-rostralmiddlefrontal_5,255,0,239,0,15663359,21,L mfc,Left mfc,Left,NA,TRUE,2,mfc
+258,left-rostralmiddlefrontal_6,255,104,0,0,26879,9,L dlpfc,Left dlpfc,Left,NA,TRUE,2,dlpfc
+259,left-rostralmiddlefrontal_7,255,0,214,0,14024959,9,L dlpfc,Left dlpfc,Left,NA,TRUE,2,dlpfc
+260,left-rostralmiddlefrontal_8,14,0,255,0,16711694,9,L dlpfc,Left dlpfc,Left,NA,TRUE,2,dlpfc
+261,left-rostralmiddlefrontal_9,0,255,126,0,8322816,9,L dlpfc,Left dlpfc,Left,NA,TRUE,2,dlpfc
+262,left-rostralmiddlefrontal_10,255,0,122,0,7995647,9,L dlpfc,Left dlpfc,Left,NA,TRUE,2,dlpfc
+263,left-rostralmiddlefrontal_11,186,255,0,0,65466,NA,,,,NA,NA,NA,NA
+264,left-rostralmiddlefrontal_12,0,255,255,0,16776960,NA,,,,NA,NA,NA,NA
+265,left-superiorfrontal_1,255,0,251,0,16449791,NA,,,,NA,NA,NA,NA
+266,left-superiorfrontal_2,0,84,255,0,16733184,NA,,,,NA,NA,NA,NA
+267,left-superiorfrontal_3,0,231,255,0,16770816,NA,,,,NA,NA,NA,NA
+268,left-superiorfrontal_4,0,169,255,0,16754944,NA,,,,NA,NA,NA,NA
+269,left-superiorfrontal_5,0,255,22,0,1507072,NA,,,,NA,NA,NA,NA
+270,left-superiorfrontal_6,0,126,255,0,16743936,NA,,,,NA,NA,NA,NA
+271,left-superiorfrontal_7,100,255,0,0,65380,NA,,,,NA,NA,NA,NA
+272,left-superiorfrontal_8,0,157,255,0,16751872,NA,,,,NA,NA,NA,NA
+273,left-superiorfrontal_9,39,0,255,0,16711719,NA,,,,NA,NA,NA,NA
+274,left-superiorfrontal_10,0,71,255,0,16729856,NA,,,,NA,NA,NA,NA
+275,left-superiorfrontal_11,255,0,220,0,14418175,NA,,,,NA,NA,NA,NA
+276,left-superiorfrontal_12,143,255,0,0,65423,NA,,,,NA,NA,NA,NA
+277,left-superiorfrontal_13,0,255,96,0,6356736,NA,,,,NA,NA,NA,NA
+278,left-superiorfrontal_14,0,65,255,0,16728320,NA,,,,NA,NA,NA,NA
+279,left-superiorfrontal_15,255,0,208,0,13631743,NA,,,,NA,NA,NA,NA
+280,left-superiorfrontal_16,0,218,255,0,16767488,NA,,,,NA,NA,NA,NA
+281,left-superiorfrontal_17,255,67,0,0,17407,NA,,,,NA,NA,NA,NA
+282,left-superiorfrontal_18,88,0,255,0,16711768,NA,,,,NA,NA,NA,NA
+283,left-caudalmiddlefrontal_1,0,255,145,0,9568000,NA,,,,NA,NA,NA,NA
+284,left-caudalmiddlefrontal_2,8,255,0,0,65288,NA,,,,NA,NA,NA,NA
+285,left-caudalmiddlefrontal_3,255,0,153,0,10027263,21,L mfc,Left mfc,Left,NA,TRUE,2,mfc
+286,left-caudalmiddlefrontal_4,63,0,255,0,16711743,NA,,,,NA,NA,NA,NA
+287,left-caudalmiddlefrontal_5,235,255,0,0,65515,NA,,,,NA,NA,NA,NA
+288,left-caudalmiddlefrontal_6,137,255,0,0,65417,NA,,,,NA,NA,NA,NA
+289,left-precentral_1,124,0,255,0,16711804,NA,,,,NA,NA,NA,NA
+290,left-precentral_2,63,255,0,0,65343,NA,,,,NA,NA,NA,NA
+291,left-precentral_3,255,0,98,0,6422783,NA,,,,NA,NA,NA,NA
+292,left-precentral_4,45,0,255,0,16711725,31,L precg,Left precg,Left,NA,TRUE,2,precg
+293,left-precentral_5,0,47,255,0,16723712,31,L precg,Left precg,Left,NA,TRUE,2,precg
+294,left-precentral_6,0,255,169,0,11140864,31,L precg,Left precg,Left,NA,TRUE,2,precg
+295,left-precentral_7,255,0,226,0,14811391,NA,,,,NA,NA,NA,NA
+296,left-precentral_8,255,159,0,0,40959,31,L precg,Left precg,Left,NA,TRUE,2,precg
+297,left-precentral_9,216,0,255,0,16711896,31,L precg,Left precg,Left,NA,TRUE,2,precg
+298,left-precentral_10,255,24,0,0,6399,31,L precg,Left precg,Left,NA,TRUE,2,precg
+299,left-precentral_11,228,0,255,0,16711908,NA,,,,NA,NA,NA,NA
+300,left-precentral_12,180,255,0,0,65460,NA,,,,NA,NA,NA,NA
+301,left-precentral_13,255,153,0,0,39423,NA,,,,NA,NA,NA,NA
+302,left-precentral_14,14,255,0,0,65294,NA,,,,NA,NA,NA,NA
+303,left-precentral_15,0,206,255,0,16764416,NA,,,,NA,NA,NA,NA
+304,left-precentral_16,0,108,255,0,16739328,NA,,,,NA,NA,NA,NA
+305,left-paracentral_1,0,255,231,0,15204096,NA,,,,NA,NA,NA,NA
+306,left-paracentral_2,204,255,0,0,65484,NA,,,,NA,NA,NA,NA
+307,left-paracentral_3,33,0,255,0,16711713,NA,,,,NA,NA,NA,NA
+308,left-paracentral_4,210,255,0,0,65490,NA,,,,NA,NA,NA,NA
+309,left-paracentral_5,75,0,255,0,16711755,NA,,,,NA,NA,NA,NA
+310,left-rostralanteriorcingulate_1,173,255,0,0,65453,NA,,,,NA,NA,NA,NA
+311,left-rostralanteriorcingulate_2,131,0,255,0,16711811,1,L aCING,Left acc,Left,NA,TRUE,2,acc
+312,left-caudalanteriorcingulate_1,0,35,255,0,16720640,1,L aCING,Left acc,Left,NA,TRUE,2,acc
+313,left-caudalanteriorcingulate_2,112,0,255,0,16711792,1,L aCING,Left acc,Left,NA,TRUE,2,acc
+314,left-posteriorcingulate_1,0,10,255,0,16714240,NA,L pCING,,,NA,NA,NA,NA
+315,left-posteriorcingulate_2,149,0,255,0,16711829,NA,L pCING,,,NA,NA,NA,NA
+316,left-posteriorcingulate_3,192,255,0,0,65472,NA,L pCING,,,NA,NA,NA,NA
+317,left-posteriorcingulate_4,192,0,255,0,16711872,NA,L pCING,,,NA,NA,NA,NA
+318,left-isthmuscingulate_1,255,129,0,0,33279,27,L pcc,Left pcc,Left,NA,TRUE,2,pcc
+319,left-isthmuscingulate_2,0,163,255,0,16753408,27,L pcc,Left pcc,Left,NA,TRUE,2,pcc
+320,left-isthmuscingulate_3,173,0,255,0,16711853,NA,,,,NA,NA,NA,NA
+321,left-postcentral_1,27,0,255,0,16711707,NA,,,,NA,NA,NA,NA
+322,left-postcentral_2,131,255,0,0,65411,NA,,,,NA,NA,NA,NA
+323,left-postcentral_3,0,255,206,0,13565696,29,L pocg,Left pocg,Left,NA,TRUE,2,pocg
+324,left-postcentral_4,228,255,0,0,65508,NA,,,,NA,NA,NA,NA
+325,left-postcentral_5,20,0,255,0,16711700,29,L pocg,Left pocg,Left,NA,TRUE,2,pocg
+326,left-postcentral_6,255,110,0,0,28415,29,L pocg,Left pocg,Left,NA,TRUE,2,pocg
+327,left-postcentral_7,255,233,0,0,59903,29,L pocg,Left pocg,Left,NA,TRUE,2,pocg
+328,left-postcentral_8,0,29,255,0,16719104,29,L pocg,Left pocg,Left,NA,TRUE,2,pocg
+329,left-postcentral_9,155,0,255,0,16711835,29,L pocg,Left pocg,Left,NA,TRUE,2,pocg
+330,left-postcentral_10,155,255,0,0,65435,29,L pocg,Left pocg,Left,NA,TRUE,2,pocg
+331,left-postcentral_11,0,255,78,0,5177088,NA,,,,NA,NA,NA,NA
+332,left-postcentral_12,39,255,0,0,65319,NA,,,,NA,NA,NA,NA
+333,left-postcentral_13,161,0,255,0,16711841,NA,,,,NA,NA,NA,NA
+334,left-postcentral_14,255,98,0,0,25343,NA,,,,NA,NA,NA,NA
+335,left-supramarginal_1,255,122,0,0,31487,NA,,,,NA,NA,NA,NA
+336,left-supramarginal_2,0,255,71,0,4718336,NA,,,,NA,NA,NA,NA
+337,left-supramarginal_3,0,255,53,0,3538688,NA,,,,NA,NA,NA,NA
+338,left-supramarginal_4,255,135,0,0,34815,NA,,,,NA,NA,NA,NA
+339,left-supramarginal_5,255,0,141,0,9240831,NA,,,,NA,NA,NA,NA
+340,left-supramarginal_6,0,212,255,0,16765952,NA,,,,NA,NA,NA,NA
+341,left-supramarginal_7,0,255,188,0,12386048,NA,,,,NA,NA,NA,NA
+342,left-supramarginal_8,255,37,0,0,9727,NA,,,,NA,NA,NA,NA
+343,left-supramarginal_9,255,12,0,0,3327,NA,,,,NA,NA,NA,NA
+344,left-supramarginal_10,0,16,255,0,16715776,NA,,,,NA,NA,NA,NA
+345,left-superiorparietal_1,255,116,0,0,29951,35,L SPC,Left spl,Left,NA,TRUE,2,spl
+346,left-superiorparietal_2,255,245,0,0,62975,35,L SPC,Left spl,Left,NA,TRUE,2,spl
+347,left-superiorparietal_3,255,208,0,0,53503,NA,,,,NA,NA,NA,NA
+348,left-superiorparietal_4,0,59,255,0,16726784,35,L SPC,Left spl,Left,NA,TRUE,2,spl
+349,left-superiorparietal_5,69,255,0,0,65349,NA,,,,NA,NA,NA,NA
+350,left-superiorparietal_6,94,255,0,0,65374,NA,,,,NA,NA,NA,NA
+351,left-superiorparietal_7,57,0,255,0,16711737,35,L SPC,Left spl,Left,NA,TRUE,2,spl
+352,left-superiorparietal_8,0,182,255,0,16758272,35,L SPC,Left spl,Left,NA,TRUE,2,spl
+353,left-superiorparietal_9,118,255,0,0,65398,NA,,,,NA,NA,NA,NA
+354,left-superiorparietal_10,8,0,255,0,16711688,NA,,,,NA,NA,NA,NA
+355,left-superiorparietal_11,82,255,0,0,65362,NA,,,,NA,NA,NA,NA
+356,left-superiorparietal_12,186,0,255,0,16711866,NA,,,,NA,NA,NA,NA
+357,left-superiorparietal_13,255,80,0,0,20735,NA,,,,NA,NA,NA,NA
+358,left-superiorparietal_14,94,0,255,0,16711774,NA,,,,NA,NA,NA,NA
+359,left-inferiorparietal_1,216,255,0,0,65496,NA,,,,NA,NA,NA,NA
+360,left-inferiorparietal_2,112,255,0,0,65392,3,L ang,Left ang,Left,NA,TRUE,2,ang
+361,left-inferiorparietal_3,255,0,110,0,7209215,3,L ang,Left ang,Left,NA,TRUE,2,ang
+362,left-inferiorparietal_4,51,255,0,0,65331,3,L ang,Left ang,Left,NA,TRUE,2,ang
+363,left-inferiorparietal_5,241,0,255,0,16711921,NA,,,,NA,NA,NA,NA
+364,left-inferiorparietal_6,255,214,0,0,55039,3,L ang,Left ang,Left,NA,TRUE,2,ang
+365,left-inferiorparietal_7,33,255,0,0,65313,3,L ang,Left ang,Left,NA,TRUE,2,ang
+366,left-inferiorparietal_8,0,255,102,0,6749952,NA,,,,NA,NA,NA,NA
+367,left-inferiorparietal_9,255,49,0,0,12799,NA,,,,NA,NA,NA,NA
+368,left-inferiorparietal_10,255,202,0,0,51967,NA,,,,NA,NA,NA,NA
+369,left-precuneus_1,255,190,0,0,48895,33,L precuneus,Left precuneus,Left,NA,TRUE,2,precuneus
+370,left-precuneus_2,0,255,249,0,16383744,33,L precuneus,Left precuneus,Left,NA,TRUE,2,precuneus
+371,left-precuneus_3,0,237,255,0,16772352,33,L precuneus,Left precuneus,Left,NA,TRUE,2,precuneus
+372,left-precuneus_4,0,243,255,0,16773888,33,L precuneus,Left precuneus,Left,NA,TRUE,2,precuneus
+373,left-precuneus_5,255,196,0,0,50431,NA,,,,NA,NA,NA,NA
+374,left-precuneus_6,255,55,0,0,14335,NA,,,,NA,NA,NA,NA
+375,left-precuneus_7,0,22,255,0,16717312,NA,,,,NA,NA,NA,NA
+376,left-precuneus_8,255,147,0,0,37887,NA,,,,NA,NA,NA,NA
+377,left-precuneus_9,222,0,255,0,16711902,NA,,,,NA,NA,NA,NA
+378,left-precuneus_10,0,249,255,0,16775424,NA,,,,NA,NA,NA,NA
+379,left-precuneus_11,255,171,0,0,44031,NA,,,,NA,NA,NA,NA
+380,left-cuneus_1,88,255,0,0,65368,NA,,,,NA,NA,NA,NA
+381,left-cuneus_2,255,0,165,0,10813695,NA,,,,NA,NA,NA,NA
+382,left-cuneus_3,149,255,0,0,65429,NA,,,,NA,NA,NA,NA
+383,left-pericalcarine_1,124,255,0,0,65404,5,L calcarine,Left calcarine,Left,NA,TRUE,2,calcarine
+384,left-pericalcarine_2,198,0,255,0,16711878,5,L calcarine,Left calcarine,Left,NA,TRUE,2,calcarine
+385,left-pericalcarine_3,255,251,0,0,64511,5,L calcarine,Left calcarine,Left,NA,TRUE,2,calcarine
+386,left-lateraloccipital_1,255,0,0,0,255,NA,,,,NA,NA,NA,NA
+387,left-lateraloccipital_2,255,31,0,0,8191,NA,,,,NA,NA,NA,NA
+388,left-lateraloccipital_3,255,0,135,0,8847615,NA,,,,NA,NA,NA,NA
+389,left-lateraloccipital_4,255,0,116,0,7602431,NA,,,,NA,NA,NA,NA
+390,left-lateraloccipital_5,0,255,218,0,14352128,NA,,,,NA,NA,NA,NA
+391,left-lateraloccipital_6,253,255,0,0,65533,NA,,,,NA,NA,NA,NA
+392,left-lateraloccipital_7,167,255,0,0,65447,NA,,,,NA,NA,NA,NA
+393,left-lateraloccipital_8,204,0,255,0,16711884,NA,,,,NA,NA,NA,NA
+394,left-lateraloccipital_9,255,165,0,0,42495,NA,,,,NA,NA,NA,NA
+395,left-lateraloccipital_10,2,255,0,0,65282,NA,,,,NA,NA,NA,NA
+396,left-lateraloccipital_11,255,0,202,0,13238527,NA,,,,NA,NA,NA,NA
+397,left-lingual_1,161,255,0,0,65441,NA,,,,NA,NA,NA,NA
+398,left-lingual_2,255,0,233,0,15270143,5,L calcarine,Left calcarine,Left,NA,TRUE,2,calcarine
+399,left-lingual_3,255,86,0,0,22271,5,L calcarine,Left calcarine,Left,NA,TRUE,2,calcarine
+400,left-lingual_4,198,255,0,0,65478,NA,,,,NA,NA,NA,NA
+401,left-lingual_5,0,200,255,0,16762880,5,L calcarine,Left calcarine,Left,NA,TRUE,2,calcarine
+402,left-lingual_6,0,255,47,0,3145472,5,L calcarine,Left calcarine,Left,NA,TRUE,2,calcarine
+403,left-lingual_7,0,255,120,0,7929600,NA,,,,NA,NA,NA,NA
+404,left-lingual_8,20,255,0,0,65300,NA,,,,NA,NA,NA,NA
+405,left-fusiform_1,0,41,255,0,16722176,NA,,,,NA,NA,NA,NA
+406,left-fusiform_2,0,114,255,0,16740864,NA,,,,NA,NA,NA,NA
+407,left-fusiform_3,255,43,0,0,11263,NA,,,,NA,NA,NA,NA
+408,left-fusiform_4,0,255,35,0,2359040,NA,,,,NA,NA,NA,NA
+409,left-fusiform_5,106,0,255,0,16711786,NA,,,,NA,NA,NA,NA
+410,left-fusiform_6,255,220,0,0,56575,NA,,,,NA,NA,NA,NA
+411,left-fusiform_7,0,194,255,0,16761344,NA,,,,NA,NA,NA,NA
+412,left-fusiform_8,255,0,92,0,6029567,NA,,,,NA,NA,NA,NA
+413,left-parahippocampal_1,0,175,255,0,16756480,NA,,,,NA,NA,NA,NA
+414,left-parahippocampal_2,0,151,255,0,16750336,NA,,,,NA,NA,NA,NA
+415,left-parahippocampal_3,0,255,59,0,3931904,NA,,,,NA,NA,NA,NA
+417,left-temporalpole_1,255,73,0,0,18943,39,L temppole,Left temppole,Left,NA,TRUE,2,temppole
+416,left-entorhinal_1,0,255,16,0,1113856,11,L HIP,Left entorhinal,Left,NA,TRUE,2,entorhinal
+418,left-inferiortemporal_1,0,255,224,0,14745344,43,L aITC,Left vlt,Left,NA,TRUE,2,vlt
+419,left-inferiortemporal_2,0,139,255,0,16747264,43,L aITC,Left vlt,Left,NA,TRUE,2,vlt
+420,left-inferiortemporal_3,253,0,255,0,16711933,NA,,,,NA,NA,NA,NA
+421,left-inferiortemporal_4,51,0,255,0,16711731,NA,,,,NA,NA,NA,NA
+422,left-inferiortemporal_5,0,255,194,0,12779264,NA,,,,NA,NA,NA,NA
+423,left-inferiortemporal_6,106,255,0,0,65386,NA,,,,NA,NA,NA,NA
+424,left-inferiortemporal_7,0,224,255,0,16769024,NA,,,,NA,NA,NA,NA
+425,left-inferiortemporal_8,0,255,4,0,327424,NA,,,,NA,NA,NA,NA
+426,left-middletemporal_1,255,184,0,0,47359,NA,,,,NA,NA,NA,NA
+427,left-middletemporal_2,0,255,175,0,11534080,NA,,,,NA,NA,NA,NA
+428,left-middletemporal_3,255,61,0,0,15871,NA,,,,NA,NA,NA,NA
+429,left-middletemporal_4,0,4,255,0,16712704,23,L mtg,Left mtg,Left,NA,TRUE,2,mtg
+430,left-middletemporal_5,255,0,171,0,11206911,23,L mtg,Left mtg,Left,NA,TRUE,2,mtg
+431,left-middletemporal_6,0,255,157,0,10354432,23,L mtg,Left mtg,Left,NA,TRUE,2,mtg
+432,left-middletemporal_7,255,6,0,0,1791,NA,,,,NA,NA,NA,NA
+433,left-bankssts_1,255,0,104,0,6815999,45,L wernicke,Left wernicke,Left,NA,TRUE,2,wernicke
+434,left-bankssts_2,0,255,29,0,1965824,NA,,,,NA,NA,NA,NA
+435,left-bankssts_3,255,0,159,0,10420479,45,L wernicke,Left wernicke,Left,NA,TRUE,2,wernicke
+436,left-superiortemporal_1,0,255,108,0,7143168,45,L wernicke,Left wernicke,Left,NA,TRUE,2,wernicke
+437,left-superiortemporal_2,0,255,90,0,5963520,45,L wernicke,Left wernicke,Left,NA,TRUE,2,wernicke
+438,left-superiortemporal_3,75,255,0,0,65355,NA,,,,NA,NA,NA,NA
+439,left-superiortemporal_4,0,133,255,0,16745728,NA,,,,NA,NA,NA,NA
+440,left-superiortemporal_5,0,255,163,0,10747648,37,L SMTC,Left stg,Left,NA,TRUE,2,stg
+441,left-superiortemporal_6,100,0,255,0,16711780,37,L SMTC,Left stg,Left,NA,TRUE,2,stg
+442,left-superiortemporal_7,27,255,0,0,65307,37,L SMTC,Left stg,Left,NA,TRUE,2,stg
+443,left-superiortemporal_8,255,0,196,0,12845311,37,L SMTC,Left stg,Left,NA,TRUE,2,stg
+444,left-superiortemporal_9,180,0,255,0,16711860,37,L SMTC,Left stg,Left,NA,TRUE,2,stg
+445,left-superiortemporal_10,0,255,212,0,13958912,NA,,,,NA,NA,NA,NA
+446,left-superiortemporal_11,0,145,255,0,16748800,NA,,,,NA,NA,NA,NA
+447,left-transversetemporal_1,0,255,65,0,4325120,NA,,,,NA,NA,NA,NA
+448,left-transversetemporal_2,0,255,151,0,9961216,NA,,,,NA,NA,NA,NA
+449,left-insula_1,167,0,255,0,16711847,NA,,,,NA,NA,NA,NA
+450,left-insula_2,0,255,10,0,720640,NA,,,,NA,NA,NA,NA
+451,left-insula_3,137,0,255,0,16711817,17,L aINS,Left insula,Left,NA,TRUE,2,insula
+452,left-insula_4,255,92,0,0,23807,17,L aINS,Left insula,Left,NA,TRUE,2,insula
+453,left-insula_5,0,120,255,0,16742400,17,L aINS,Left insula,Left,NA,TRUE,2,insula
+454,left-insula_6,0,255,200,0,13172480,17,L aINS,Left insula,Left,NA,TRUE,2,insula
+455,left-insula_7,0,255,84,0,5570304,17,L aINS,Left insula,Left,NA,TRUE,2,insula

@@ -1,0 +1,227 @@
+dorsAttnLabels = contains(NetworkDataGeneral.Schaefer400x7.LUT.Label_Name2,'DorsAttn')';
+ventAttnLabels = contains(NetworkDataGeneral.Schaefer400x7.LUT.Label_Name2,'VentAttn')'; 
+limbicAttnLabels = contains(NetworkDataGeneral.Schaefer400x7.LUT.Label_Name2,'Limbic')'; 
+sensorimotor  = contains(NetworkDataGeneral.Schaefer400x7.LUT.Label_Name2,'SomMot')';  
+
+
+networkNames={'DorsAttn','VentAttn','Limbic','SomMot','All'}
+
+for i=5
+if(i==5)
+    currNetwork=true(1,length(limbicAttnLabels));
+else
+    currNetwork=contains(NetworkDataGeneral.Schaefer400x7.LUT.Label_Name2,networkNames{i})';
+end
+saveName=[networkNames{i}];
+
+
+%saveName='all';
+
+subNamesRaw={'HIP-rh',
+'AMY-rh',
+'pTHA-rh',
+'aTHA-rh',
+'NAc-rh',
+'GP-rh',
+'PUT-rh',
+'CAU-rh',
+'HIP-lh',
+'AMY-lh',
+'pTHA-lh',
+'aTHA-lh',
+'NAc-lh',
+'GP-lh',
+'PUT-lh',
+'CAU-lh'
+}
+regNamesRaw = NetworkDataGeneral.Schaefer400x7.LUT.Label_Name2(currNetwork);
+SN= length(regNamesRaw);
+regNames=cell(1,SN);
+    
+    for j = 1:SN
+        nameSplit = strrep(regNamesRaw{j},'_','-');
+        regNames{j} = nameSplit;
+    end
+
+
+currCoM=NetworkDataGeneral.Schaefer400x7.CoM(currNetwork,:);
+ N = sum(currNetwork);
+% thickCtrl = AllResults.Thickness.Mean(CohortsIndexs==1,currNetwork);
+% thickTau = AllResults.Thickness.Mean(CohortsIndexs==2,currNetwork);
+% thickTDP = AllResults.Thickness.Mean(CohortsIndexs==3,currNetwork);
+
+%currCoM=CoM;
+%thickCtrl = CtrlResults.Thickness.Mean(:,:);
+VolyesAD = AllResults.Volume.Total(demoT.LBD0_LBDAD1 == 1,:)./(SubCorticalVol.Volume.ICV(demoT.LBD0_LBDAD1 == 1,1));
+VolnoAD = AllResults.Volume.Total(demoT.LBD0_LBDAD1 == 0,:)./(SubCorticalVol.Volume.ICV(demoT.LBD0_LBDAD1 == 0,1));
+
+VolyesADsubCortical = SubCorticalVol.Volume.Total(demoT.LBD0_LBDAD1 == 1,:)./SubCorticalVol.Volume.ICV(demoT.LBD0_LBDAD1 == 1,:);
+VolnoADsubCortical = SubCorticalVol.Volume.Total(demoT.LBD0_LBDAD1 == 0,:)./SubCorticalVol.Volume.ICV(demoT.LBD0_LBDAD1 == 0,:);
+
+VolyesADAll = [VolyesAD VolyesADsubCortical];
+VolnoADAll = 
+Ns=16;
+
+%Ctrl_Mean = mean(thickCtrl,1,'omitnan');
+%Ctrl_SD = std(thickCtrl,1,'omitnan');
+
+% Tau_W=nan(size(thickyesAD));
+% for i = 1:size(thickyesAD,1)
+%     Tau_W(i,:)= (thickyesAD(i,:) - Ctrl_Mean)./Ctrl_SD;
+% end
+% 
+% TDP_W=nan(size(thicknoAD));
+% for i = 1:size(thicknoAD,1)
+%     TDP_W(i,:)= (thicknoAD(i,:) - Ctrl_Mean)./Ctrl_SD;
+% end
+%     
+% mean_Tau_w = mean(Tau_W,1,'omitnan');
+% mean_TDP_w = mean(TDP_W,1,'omitnan');
+    
+%covMatCtrl = nan(N,N);
+covMatyesAD = nan(N,Ns);
+covMatnoAD = nan(N,Ns);
+
+cmpCovYes_gt_Ctrl = nan(N,Ns);
+cmpCovNo_gt_Ctrl = nan(N,Ns);
+cmpCovYes_gt_No = nan(N,Ns);
+cmpCovNo_gt_Yes = nan(N,Ns);
+
+pthresh = .005;
+for i = 1:N
+    for j = 1:Ns
+      
+        if(i~=j)
+        %NCtrl=sum(~isnan(thickCtrl(:,i)) & ~isnan(thickCtrl(:,j)));
+        NYes=sum(~isnan(VolyesAD(:,i)) & ~isnan(VolyesAD(:,j)));
+        NNo=sum(~isnan(VolnoAD(:,i)) & ~isnan(VolnoAD(:,j)));
+
+%        if(NCtrl > 3)
+%            covMatCtrl(i,j)=corr(thickCtrl(:,i),thickCtrl(:,j),'Rows','complete');
+%        end
+        if(NYes > 3)
+            covMatyesAD(i,j)=corr(VolyesAD(:,i),VolyesADsubCortical(:,j),'Rows','complete');
+        end
+        if(NNo > 3)
+            covMatnoAD(i,j)=corr(VolnoAD(:,i),VolnoADsubCortical(:,j),'Rows','complete');
+        end
+        
+%         if(NCtrl > 3 && NYes > 3)
+%             cmpCovYes_gt_Ctrl(i,j) = TestCorrSig(covMatCtrl(i,j),covMatyesAD(i,j),NCtrl,NYes)<pthresh;
+%         end
+%         if(NCtrl > 3 && NNo > 3)
+%             cmpCovNo_gt_Ctrl(i,j) = TestCorrSig(covMatCtrl(i,j),covMatnoAD(i,j),NCtrl,NNo)<pthresh;
+%         end
+        if(NYes > 3 && NNo > 3)
+            cmpCovYes_gt_No(i,j) = TestCorrSig(covMatnoAD(i,j),covMatyesAD(i,j),NNo,NYes)<pthresh;
+            cmpCovNo_gt_Yes(i,j) = TestCorrSig(covMatyesAD(i,j),covMatnoAD(i,j),NYes,NNo)<pthresh;
+        end
+        end
+        
+    end
+end
+
+plotON=1;
+if(plotON)
+H2=figure(10)
+clf
+panelAll = panel();
+panelAll.pack(2,4);
+
+panelAll.de.margin = 1;
+panelAll.marginbottom = 1;
+panelAll.marginleft = -10;
+panelAll.margin = [0 0 0 0];
+
+H=figure(1)
+% imagesc(covMatCtrl)
+% title('controls')
+% caxis([0 1])
+% colormap('jet')
+% set(gca,'xtick',[1:N],'xticklabel',regNamesRaw)
+% set(gca,'ytick',[1:N],'yticklabel',regNamesRaw)
+% set(gca,'TickLabelInterpreter','none','FontSize',5)
+% print(H,fullfile(baseSaveDir,[ saveName '_ctrl.png']),'-dpng','-r400');
+
+
+H=figure(2)
+imagesc(covMatyesAD)
+title('LBD-yesAD')
+caxis([0 1])
+colormap('jet')
+set(gca,'xtick',[1:Ns],'xticklabel',subNamesRaw)
+set(gca,'ytick',[1:N],'yticklabel',regNamesRaw)
+set(gca,'TickLabelInterpreter','none','FontSize',5)
+print(H,fullfile(baseSaveDir,[ saveName '_yesAD.png']),'-dpng','-r400');
+
+
+H=figure(3)
+imagesc(covMatnoAD)
+title('LBD-noAD')
+caxis([0 1])
+colormap('jet')
+set(gca,'xtick',[1:Ns],'xticklabel',subNamesRaw)
+set(gca,'ytick',[1:N],'yticklabel',regNamesRaw)
+set(gca,'TickLabelInterpreter','none','FontSize',5)
+print(H,fullfile(baseSaveDir,[ saveName '_noAD.png']),'-dpng','-r400');
+
+% 
+H=figure(4)
+imagesc(cmpCovYes_gt_Ctrl)
+title('YesAD > Ctrl')
+caxis([0 1])
+colormap('jet')
+set(gca,'xtick',[1:Ns],'xticklabel',subNamesRaw)
+set(gca,'ytick',[1:N],'yticklabel',regNamesRaw)
+set(gca,'TickLabelInterpreter','none','FontSize',5)
+print(H,fullfile(baseSaveDir,[ saveName '_YesGTCTRL.png']),'-dpng','-r400');
+
+ cRange = [0 1];
+ MakerVec=ones(1,sum(currNetwork));
+ colorVec=ones(1,sum(currNetwork));
+LabelNames=regNamesRaw;
+pSelect=1;
+%plotNetwork3(cmpCovYes_gt_Ctrl, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVec,panelAll,pSelect,colorVec,0)
+
+
+H=figure(5)
+imagesc(cmpCovNo_gt_Ctrl)
+title('NoAD > Ctrl')
+caxis([0 1])
+colormap('jet')
+set(gca,'xtick',[1:Ns],'xticklabel',subNamesRaw)
+set(gca,'ytick',[1:N],'yticklabel',regNamesRaw)
+set(gca,'TickLabelInterpreter','none','FontSize',5)
+print(H,fullfile(baseSaveDir,[ saveName '_NOGTCTRL.png']),'-dpng','-r400');
+pSelect=2;
+%plotNetwork3(cmpCovNo_gt_Ctrl, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVec,panelAll,pSelect,colorVec,0)
+
+H=figure(6)
+imagesc(cmpCovYes_gt_No)
+title('YesAD > NoAD')
+caxis([0 1])
+colormap('jet')
+set(gca,'xtick',[1:Ns],'xticklabel',subNamesRaw)
+set(gca,'ytick',[1:N],'yticklabel',regNamesRaw)
+set(gca,'TickLabelInterpreter','none','FontSize',5)
+print(H,fullfile(baseSaveDir,[ saveName '_YesGTNO.png']),'-dpng','-r400');
+pSelect=3;
+%plotNetwork3(cmpCovYes_gt_No, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVec,panelAll,pSelect,colorVec,0)
+
+
+
+H=figure(7)
+imagesc(cmpCovNo_gt_Yes)
+title('NoAD > YesAD')
+caxis([0 1])
+colormap('jet')
+set(gca,'xtick',[1:Ns],'xticklabel',subNamesRaw)
+set(gca,'ytick',[1:N],'yticklabel',regNamesRaw)
+set(gca,'TickLabelInterpreter','none','FontSize',5)
+print(H,fullfile(baseSaveDir,[ saveName '_NOGTYES.png']),'-dpng','-r400');
+pSelect=4;
+%plotNetwork3(cmpCovNo_gt_Yes, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVec,panelAll,pSelect,colorVec,0)
+
+print(H2,fullfile(baseSaveDir,[ saveName '_SigPlots.png']),'-dpng','-r400');
+end
+end
