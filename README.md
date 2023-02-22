@@ -1,2 +1,2 @@
 # Multimodal Brain Integration Networks (mBIN)
-This is a toolbox for doing integrated brain network analysis across multiple imaging modalities.
+Multimodal Brain Integration Networks (mBIN) is toolbox for high dimensional analysis of brain networks across multiple imaging modalities. Our goal is to enable high level visualization and interpretation of  structual and functional brain data across micro to macro scales. 
