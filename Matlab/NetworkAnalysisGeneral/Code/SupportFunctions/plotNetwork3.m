@@ -64,15 +64,15 @@ for v = 1:2
 
 
     
-    ColorVRGB(colorVec==0,:) = repmat([1 1 1], sum(colorVec==0), 1);%c1
-    ColorVRGB(colorVec==1,:) = repmat([1 0 0], sum(colorVec==1), 1);%c1
-    ColorVRGB(colorVec==2,:) = repmat([0.3281 0.0859 0.7031], sum(colorVec==2), 1);%c1
-    ColorVRGB(colorVec==3,:) = repmat([0 .5 0], sum(colorVec==3), 1);%c1
-    ColorVRGB(colorVec==4,:) = repmat([1 .5 0], sum(colorVec==4), 1);%c1
-    ColorVRGB(colorVec==5,:) = repmat([1 1 0], sum(colorVec==5), 1);%c1
-    ColorVRGB(colorVec==6,:) = repmat([240, 163, 255]/255, sum(colorVec==6), 1);%c1
-    ColorVRGB(colorVec==7,:) = repmat([240,163,255]/255, sum(colorVec==7), 1);%c1
-    
+%     ColorVRGB(colorVec==0,:) = repmat([1 1 1], sum(colorVec==0), 1);%c1
+%     ColorVRGB(colorVec==1,:) = repmat([1 0 0], sum(colorVec==1), 1);%c1
+%     ColorVRGB(colorVec==2,:) = repmat([0.3281 0.0859 0.7031], sum(colorVec==2), 1);%c1
+%     ColorVRGB(colorVec==3,:) = repmat([0 .5 0], sum(colorVec==3), 1);%c1
+%     ColorVRGB(colorVec==4,:) = repmat([1 .5 0], sum(colorVec==4), 1);%c1
+%     ColorVRGB(colorVec==5,:) = repmat([1 1 0], sum(colorVec==5), 1);%c1
+%     ColorVRGB(colorVec==6,:) = repmat([240, 163, 255]/255, sum(colorVec==6), 1);%c1
+%     ColorVRGB(colorVec==7,:) = repmat([240,163,255]/255, sum(colorVec==7), 1);%c1
+%     
 
     if(blue0orng1brwn2jet3==1)
         %Orange lines

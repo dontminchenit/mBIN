@@ -99,7 +99,7 @@ cRange = [0 1];
 colorVec=ones(1,SN-1);
 LabelNames=pathNamesAdj;
 pSelectCol=1;
-plotNetwork3(covMat_yesAD, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecYes,panelAll,pSelectCol,colorVec,4)
+plotNetwork3(covMat_yesAD, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecYes,panelAll,pSelectCol,colorVec,3)
 
 
 H=figure(3)
@@ -112,7 +112,7 @@ set(gca,'ytick',[1:N],'yticklabel',pathNamesAdj)
 set(gca,'TickLabelInterpreter','none','FontSize',5)
 print(H,fullfile(baseSaveDir,[ 'CovMat_noAD.png']),'-dpng','-r400');
 pSelectCol=2;
-plotNetwork3(covMat_noAD, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecNo,panelAll,pSelectCol,colorVec,4)
+plotNetwork3(covMat_noAD, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecNo,panelAll,pSelectCol,colorVec,3)
 
 
 H=figure(6)
@@ -126,7 +126,7 @@ set(gca,'ytick',[1:N],'yticklabel',pathNamesAdj)
 set(gca,'TickLabelInterpreter','none','FontSize',5)
 print(H,fullfile(baseSaveDir,[ saveName '_TAUGTTDP.png']),'-dpng','-r400');
 pSelectCol=3;
-plotNetwork3(cmpCovYes_gt_No, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecYes,panelAll,pSelectCol,colorVec,0)
+plotNetwork3(cmpCovYes_gt_No, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecYes,panelAll,pSelectCol,colorVec,3)
 
 
 H=figure(7)
@@ -141,6 +141,6 @@ print(H,fullfile(baseSaveDir,[ saveName '_1TDPGTTAU.png']),'-dpng','-r400');
 pSelectCol=4;
 %MakerVecYes=mean(path_noAD,1,'omitnan');
 %MakerVecYes=2*(MakerVecYes-minPath)/maxPath;
-plotNetwork3(cmpCovNo_gt_Yes, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecNo,panelAll,pSelectCol,colorVec,0)
+plotNetwork3(cmpCovNo_gt_Yes, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecNo,panelAll,pSelectCol,colorVec,3)
 
 print(H2,fullfile(baseSaveDir,[ saveName '_SigPlots.png']),'-dpng','-r400');

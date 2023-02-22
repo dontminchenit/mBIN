@@ -1,0 +1,80 @@
+LoadData
+
+%comparison Against GlobalEFf
+
+for i = 1:2
+if i ==1
+    mName = 'GlobalEff';
+    labelName = 'Global Efficiency';
+else
+    mName = 'MeanStr';
+    labelName = 'Mean Nodal Strength';
+end
+
+Nmax = max([length(HCIND) length(svIND) length(naIND)]);
+allData = nan(5,3,Nmax);
+
+for j = 1:3
+    vals = AllResults.FAGraph.(mName)(GroupInd{j});
+    allData(1,j,1:length(val = 
+end
+
+figure(1)
+ all_hc=AllResults.FAGraph.(mName)(HCIND);
+ all_sv=AllResults.FAGraph.(mName)(svIND);
+ all_na=AllResults.FAGraph.(mName)(naIND);
+
+figure(2)
+all_hc=SubnetworkResultsSV.FAGraph.(mName)(HCIND);
+all_sv=SubnetworkResultsSV.FAGraph.(mName)(svIND);
+
+
+x2=SubnetworkResultsNA.FAGraph.(mName)(naIND);
+x2_hc=SubnetworkResultsNA.FAGraph.(mName)(HCIND);
+
+x3=nonSubnetworkResultsSV.FAGraph.(mName)(svIND);
+x3_hc=nonSubnetworkResultsSV.FAGraph.(mName)(HCIND);
+
+x4=nonSubnetworkResultsNA.FAGraph.(mName)(naIND);
+x4_hc=nonSubnetworkResultsNA.FAGraph.(mName)(HCIND);
+
+x = [x1; x2; x3; x4];
+g = [zeros(length(x1), 1); ones(length(x2), 1); 2*ones(length(x3), 1); 3*ones(length(x4), 1)];
+boxplot(x, g)
+
+
+x = 1:3;
+y = randn(5, 3, 100);
+
+% Plot boxplots
+
+h = boxplot2(y,x);
+
+% Alter linestyle and color
+
+cmap = get(0, 'defaultaxescolororder');
+for ii = 1:3
+    structfun(@(x) set(x(ii,:), 'color', cmap(ii,:), ...
+        'markeredgecolor', cmap(ii,:)), h);
+end
+set([h.lwhis h.uwhis], 'linestyle', '-');
+set(h.out, 'marker', '.');
+
+
+
+
+
+
+
+ylabel(labelName)
+set(gca,'xtick',1:4, 'xticklabel',{'svPPA - In Network','naPPA - In Network','svPPA - Out Network','naPPA - Out Network'})
+xtickangle(45)
+title('Atrophied vs Non-Atrophied Nodes')
+end
+
+ 
+
+
+%  
+%  
+%  

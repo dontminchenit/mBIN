@@ -48,7 +48,7 @@ if(flipCmap)
     c(1,:)=[1 1 1];
 end
 clim(CRange)
-colormap(c);
+%colormap(c);
 
 %     xlim([min(giiSurf.vertices(:,1)) max(giiSurf.vertices(:,1))])
 %     ylim([min(giiSurf.vertices(:,2)) max(giiSurf.vertices(:,2))])
