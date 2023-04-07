@@ -18,6 +18,7 @@ hemi = {'L','R'}
             pathLabelIdx = find(matches(pathLUT.PathName,AOName) & matches(pathLUT.Label_Hemi,hemi{r}));
             if(~isempty(pathLabelIdx))
                 atlasIdx = pathLUT.Label_ID400x7(pathLabelIdx);
+             
                 pathCoM(l,:,r)=mean(AtlasCoM(atlasIdx,:),1,'omitnan');
                 pathToAtlasIndex{l,r}=atlasIdx;
                     
