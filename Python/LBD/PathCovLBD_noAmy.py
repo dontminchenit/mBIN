@@ -221,3 +221,4 @@ def pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathD
     # plt.savefig(outputDir + "/TESTATLAS_TAUGTTDP2.png", dpi=400)
 
 # Solid mesh --> Map the dots on the surface, not transparent
+###
