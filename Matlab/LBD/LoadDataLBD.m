@@ -66,6 +66,7 @@ AtlasToPathLUT = readtable(fullfile(currBase,'LBDData','PathToAtlasLUT_10_7_2022
 [pathCoMunordered, pathToAtlasIndexunordered] = findPathCoM(pathLUT,AtlasToPathLUT,NetworkDataGeneral.Schaefer400x7.CoM);
 pathCoM=nan(SN,3,2);
 pathToAtlasIndex = cell(SN,2);
+
 for s=1:SN
 
     idx = find(strcmpi(AtlasToPathLUT.PathSpreadSheetNames,pathNamesRaw(s)));

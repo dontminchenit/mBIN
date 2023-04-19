@@ -43,6 +43,15 @@ for v = 1:2
      c5=cmap(round(256*5/6),:);
      c6=cmap(round(256*6/6),:);
 
+     c1
+     c2
+     c3
+     c4
+     c5
+     c6
+        
+     ColorVRGB
+
      ColorVRGB(colorVec==0,:) = repmat(c6, sum(colorVec==0), 1);%c1
      ColorVRGB(colorVec==1,:) = repmat(c1, sum(colorVec==1), 1);%c1
      ColorVRGB(colorVec==2,:) = repmat(c2, sum(colorVec==2), 1);%c1
@@ -51,6 +60,8 @@ for v = 1:2
      ColorVRGB(colorVec==5,:) = repmat(c5, sum(colorVec==5), 1);%c1
      ColorVRGB(colorVec==6,:) = repmat(c6, sum(colorVec==6), 1);%c1
      ColorVRGB(colorVec==7,:) = repmat(c6, sum(colorVec==7), 1);%c1    
+
+     ColorVRGB
 
     if(blue0orng1brwn2jet3==1)
         h=plot(G,'XData',CoM(:,1),'YData',CoM(:,2),'ZData',CoM(:,3),'interpreter','none','EdgeColor',[251, 97, 26]/255,'linewidth',3,'MarkerSize',4.25*MakerVec,'Marker','o','NodeColor',ColorVRGB);
@@ -94,7 +105,7 @@ for v = 1:2
     hold on
     
     % Creates the 3D Brain surface
-    t=plotgiiSurf(GIImesh.giiSurface_Both, surfvalDisp, viewA,viewE,cRange,0,5,1);
+t=plotgiiSurf(GIImesh.giiSurface_Both, surfvalDisp, viewA,viewE,cRange,0,5,1);
     
     alpha(t,.05)
     hold off

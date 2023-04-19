@@ -78,7 +78,7 @@ def pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathD
     # Clear the figure
     plt.clf()
 
-    sns.set_theme(style="white")
+    #sns.set_theme(style="white")
     
     # ---------------------covMat_yesAD--------------------
     N = covMat_yesAD.shape[0]
@@ -171,9 +171,6 @@ def pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathD
 
     
     # ---------------------LBD_SigPlots--------------------
-    # Create a new figure with figure number 10
-    H2 = plt.figure(10)
-
     # Use the matplotlib - subplot
 
     
@@ -195,23 +192,32 @@ def pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathD
     MakerVecYes = np.delete(MakerVecYes, 1)
     MakerVecNo = np.delete(MakerVecNo, 1)
 #---
-    # cRange = [0, 1]
 
-    # colorVec = np.ones(sn-1)
+    cRange = [0, 1]
 
-    # LabelNames = pathNamesAdj.copy()
+    colorVec = np.ones(sn-1)
 
-    # pSelectCol = 1
-    # plotNetwork3(covMat_yesAD, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecYes, panelAll, pSelectCol, colorVec, 3)
+    LabelNames = pathNamesAdj.copy()
 
-    # pSelectCol=2
-    # plotNetwork3(covMat_noAD, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecNo, panelAll, pSelectCol, colorVec, 3)
+    # Define figure
+    fig_atlas = plt.figure()
 
-    # pSelectCol=3
-    # plotNetwork3(cmpCovYes_gt_No, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecYes, panelAll, pSelectCol, colorVec, 3)
+    pSelectCol = 1
+    plotNetwork3(fig_atlas, covMat_yesAD, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecYes, pSelectCol, colorVec, 3)
 
-    # pSelectCol=4
-    # plotNetwork3(cmpCovNo_gt_Yes, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecNo, panelAll, pSelectCol, colorVec, 3)
+    pSelectCol=2
+    plotNetwork3(fig_atlas, covMat_noAD, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecNo, pSelectCol, colorVec, 3)
 
+    pSelectCol=3
+    plotNetwork3(fig_atlas, cmpCovYes_gt_No, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecYes, pSelectCol, colorVec, 3)
+
+    pSelectCol=4
+    plotNetwork3(fig_atlas, cmpCovNo_gt_Yes, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecNo, pSelectCol, colorVec, 3)
+
+    fig_atlas.tight_layout()
+    
+    # Save the figure
+    plt.savefig(outputDir + "/TESTATLAS_TAUGTTDP.png", dpi=1000, bbox_inches='tight')
+    # plt.savefig(outputDir + "/TESTATLAS_TAUGTTDP2.png", dpi=400)
 
 # Solid mesh --> Map the dots on the surface, not transparent
