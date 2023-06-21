@@ -1,5 +1,4 @@
 networkNames={'DorsAttn','VentAttn','Limbic','SomMot','Default','Cont','_Vis_','All'};
-
 H2=figure(10)
 %clf
 panelAll = panel();
@@ -150,7 +149,6 @@ for ii=5
                 if((cmpCovYes_gt_No(i,j) == 1 || cmpCovNo_gt_Yes(i,j) == 1) && i<j) %record significant edges
                     SigEdgesCounter=SigEdgesCounter+1;
                     ss=SigEdgesCounter;
-
                     SigEdgesT.NetworkNames{ss}=networkNames{ii};
                     SigEdgesT.ROIName1{ss}=regNames{i};
                     SigEdgesT.ROIName1_Path{ss}=pathNames{i};
@@ -200,9 +198,7 @@ for ii=5
     [r p]=corr(key_thickness_yes,measure_yes,'rows','complete');
     title(['LBD+AD, ' saveName ', r=' num2str(r) ' p=' num2str(p)]);
     lsline
-    %print(H3,fullfile(baseSaveDir,['measureCmpMMSE_YES' saveName '_' measureName '.tif']),'-dpng','-r400');
-    print(H3,fullfile(baseSaveDir,['measureCmpMMSE_YES' saveName '_' '.tif']),'-dpng','-r400'); % originally commented out
-    
+    %print(H3,fullfile(baseSaveDir,['measureCmpMMSE_YES' saveName '_' measureName '.tif']),'-dpng','-r400'); % originally commented out
 
     H3=figure(62)
     scatter(key_thickness_no,measure_no)
@@ -211,8 +207,7 @@ for ii=5
     [r p]=corr(key_thickness_no,measure_no,'rows','complete');
     title(['LBD-AD, ' saveName ', r=' num2str(r) ' p=' num2str(p)]);
     lsline
-    %print(H3,fullfile(baseSaveDir,['measureCmpMMSE_NO' saveName '_' measureName '.tif']),'-dpng','-r400');
-    print(H3,fullfile(baseSaveDir,['measureCmpMMSE_NO' saveName '_' '.tif']),'-dpng','-r400'); % originally commented out
+    %print(H3,fullfile(baseSaveDir,['measureCmpMMSE_NO' saveName '_' measureName '.tif']),'-dpng','-r400'); % originally commented out
 
     %pthresh=.05;
     %cmpCovNo_gt_Ctrl=mtxAdjustMultCmp(cmpCovNo_gt_Ctrl,pthresh);
@@ -244,7 +239,6 @@ for ii=5
     % thickCtrl = CtrlResults.Thickness.Mean(:,currNetwork);
     % thickyesAD = AllResults.Thickness.Mean(demoT.LBD0_LBDAD1 == 1,currNetwork);
     % thicknoAD = AllResults.Thickness.Mean(demoT.LBD0_LBDAD1 == 0,currNetwork);
-    
     H3=figure(2)
     subplot(1,2,1)
     scatter(degYes,mean(thickyesAD,1))
@@ -252,7 +246,7 @@ for ii=5
     title([saveName ' ,r=' num2str(h(1,2)) ' ,p=' num2str(p(1,2))], 'Interpreter', 'none');
     lsline
     xlabel('Degree')
-    ylabel('Thickness') 
+    ylabel('Thickness')
     subplot(1,2,2)
     scatter(degNo,mean(thicknoAD,1))
     [h p]=corrcoef(degNo,mean(thicknoAD,1))
@@ -261,7 +255,6 @@ for ii=5
     xlabel('Degree')
     ylabel('Thickness')
     print(H3,fullfile(baseSaveDir,['nonZero_degCorr_' saveName '.tif']),'-dpng','-r400');
-    
     plotON=1;
     if(plotON)
 
@@ -300,7 +293,6 @@ for ii=5
             set(gca,'TickLabelInterpreter','none','FontSize',5)
             print(H,fullfile(baseSaveDir,[ saveName '_noAD.png']),'-dpng','-r400');
             %
-
             H=figure(4)
             imagesc(cmpCovYes_gt_Ctrl)
             title('YesAD > Ctrl')
@@ -317,30 +309,26 @@ for ii=5
 
         thick_yesAD_exp=YesAD_W;
         thick_noAD_exp=NoAD_W;
-
         minThick=min(min([thick_yesAD_exp; thick_noAD_exp],[],1,'omitnan'));
         maxThick=max(max([thick_yesAD_exp; thick_noAD_exp]-minThick+0.0015,[],1,'omitnan'));
-
         MakerVecYes=rescale(mean(thick_yesAD_exp,1,'omitnan'),.35,.9);
         MakerVecYes=1./MakerVecYes;
         %MakerVecYes=1./((MakerVecYes-minThick)./maxThick) -1;
-
         MakerVecNo=rescale(mean(thick_noAD_exp,1,'omitnan'),.35,.9);
         MakerVecNo=1./MakerVecNo;
         %MakerVecNo=1./((MakerVecNo-minThick)./maxThick) -1;
+
 
         colorVecYes=mean(thick_yesAD_exp,1,'omitnan');
         colorVecNo=mean(thick_noAD_exp,1,'omitnan');
 
         colorVecYes=ones(1,sum(currNetwork));
         colorVecNo=ones(1,sum(currNetwork));
-        
         MakerVecYes=ones(1,sum(currNetwork));
         MakerVecNo=ones(1,sum(currNetwork));
         displayType=0;
 
         LabelNames=regNamesRaw;
-        
         pSelectcol=1;
         plotNetwork3(cmpCovYes_gt_Ctrl, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecYes,panelAll,pSelectcol,colorVecYes,displayType)
 
@@ -356,10 +344,8 @@ for ii=5
             set(gca,'TickLabelInterpreter','none','FontSize',5)
             print(H,fullfile(baseSaveDir,[ saveName '_NOGTCTRL.png']),'-dpng','-r400');
         end
-
         pSelectcol=2;
         plotNetwork3(cmpCovNo_gt_Ctrl, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecNo,panelAll,pSelectcol,colorVecNo,displayType)
-        
         if(plotMtx)
 
             H=figure(6)
@@ -388,7 +374,6 @@ for ii=5
             set(gca,'TickLabelInterpreter','none','FontSize',5)
             print(H,fullfile(baseSaveDir,[ saveName '_NOGTYES.png']),'-dpng','-r400');
         end
-
         pSelectcol=4;
         plotNetwork3(cmpCovNo_gt_Yes, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecNo,panelAll,pSelectcol,colorVecNo,displayType)
 

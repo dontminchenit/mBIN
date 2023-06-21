@@ -5,13 +5,18 @@ import networkx as nx
 from plotgiiSurf import plotgiiSurf
 
 # plotNetwork3(covMat_yesAD, NetworkDataGeneral.Schaefer400x7.GII, currCoM,LabelNames,cRange,MakerVecYes,panelAll,pSelectCol,colorVec,3)
-def plotNetwork3(currFig, adjMtx, GIImesh, CoM, LabelNames, cRange, MakerVec, pSelectCol, colorVec, blue0orng1brwn2jet3, surfDisp=None):
+def plotNetwork3Individual(currFig, adjMtx, GIImesh, CoM, LabelNames, cRange, MakerVec_Original, colorVec, blue0orng1brwn2jet3, showLabels = 1, covType = 'original', surfDisp=None):
+    MakerVec = MakerVec_Original.copy()
+    
+    # # Replace Makervec NaN or 0 --> 0.1
+    # MakerVec[np.isnan(MakerVec)] = 0.1
+    # MakerVec[MakerVec == 0] = 0.1
 
     # What is GII cdata? [327684 x 1]
     surfLabels = GIImesh['cdata'][0, 0]
     surfval = GIImesh['cdata'][0, 0]
 
-    # What is surfDisp? The number of arguments do not match 
+    # What is surfDisp --> For displaying the surface of the 3D Mesh / Not using for now
     if surfDisp is not None: # NOT USING FOR NOW
         for i in range(len(surfDisp)):
             currLabel = GIImesh['LabelLUT'][i][0] # in MatlabOpaque format --> Cannot parse
@@ -30,23 +35,19 @@ def plotNetwork3(currFig, adjMtx, GIImesh, CoM, LabelNames, cRange, MakerVec, pS
     # Get graph of adjMtx
     G = nx.Graph(adjMtx)
 
-    plotNames = ['L-Lateral', 'Dorsal']
+    # plotNames = ['L-Lateral', 'Dorsal']
 
     # Define figure    
     fig = currFig
     
     # Node, Edge Transparency
-    nodeTransparency = 0.8
+    nodeTransparency = 0.3 # 0.8
     edgeTransparency = 0.8
     atlasTransparency = 0.01
 
     for v in range(2):
-        # Get the plt subplot using v(1st, 2nd row) pSelectCol / 1: 1, 5    2: 2, 6    3: 3, 7    4: 4, 8
-        currAx = fig.add_subplot(2, 4, pSelectCol + (v * 4), projection='3d')
-
-        # ----------TESTING----------
-        # currAx = fig.add_subplot(1, 1, 1, projection='3d')
-        # ----------TESTING----------
+        # Get the plt subplot using v(1st, 2nd row) 
+        currAx = fig.add_subplot(2, 1, v+1, projection='3d')
 
         # Set the 3D view angle
         if v == 0:
@@ -58,7 +59,7 @@ def plotNetwork3(currFig, adjMtx, GIImesh, CoM, LabelNames, cRange, MakerVec, pS
             viewA = -90
             viewR = 0
 
-        ColorVRGB = np.zeros((len(colorVec), 3)) # np.zeros(5, 3)
+        ColorVRGB = np.zeros((len(colorVec), 3))
 
         # Setting the Color Maps - hot
         cmap = plt.get_cmap('hot')
@@ -73,7 +74,7 @@ def plotNetwork3(currFig, adjMtx, GIImesh, CoM, LabelNames, cRange, MakerVec, pS
 
         # colorVec = np.ones(sn-1)    --> indexed [:3]
         ColorVRGB[colorVec == 0, :] = np.tile(c6[:3], (np.sum(colorVec == 0), 1))
-        ColorVRGB[colorVec == 1, :] = np.tile(c1[:3], (np.sum(colorVec == 1), 1)) # --> Only this has any change effect
+        ColorVRGB[colorVec == 1, :] = np.tile(c1[:3], (np.sum(colorVec == 1), 1)) # --> Only this has any change effect / because: colorVec = np.ones(sn)
         ColorVRGB[colorVec == 2, :] = np.tile(c2[:3], (np.sum(colorVec == 2), 1))
         ColorVRGB[colorVec == 3, :] = np.tile(c3[:3], (np.sum(colorVec == 3), 1))
         ColorVRGB[colorVec == 4, :] = np.tile(c4[:3], (np.sum(colorVec == 4), 1))
@@ -102,7 +103,7 @@ def plotNetwork3(currFig, adjMtx, GIImesh, CoM, LabelNames, cRange, MakerVec, pS
             h.set_edgecolors(G.edges().values())
             plt.clim(cRange)
             plt.set_cmap('jet')
-        else: #blue0orng1brwn2jet3 == 3 --> cmap = 'jet'ß
+        else: #blue0orng1brwn2jet3 == 3 --> cmap = 'jet'
             # Create a dictionary of node positions (Center of Mass) from the CoM array
             # {0: array([-9.09673548, 23.98545742, 25.98642635]), 1: array([-43.86865997,  -7.98697188,  41.49483967]), 2: array([-38.51215363,  13.03796983,  37.25460958]), 3: array([-56.05636501, -22.91237593,   0.32856068]), 4: array([-32.29449158,  13.55492001,   2.34797442])}
             pos = {n: CoM[i] for i, n in enumerate(G.nodes())}
@@ -129,11 +130,13 @@ def plotNetwork3(currFig, adjMtx, GIImesh, CoM, LabelNames, cRange, MakerVec, pS
 
             # Plot the edges
             for i, vizedge in enumerate(edge_xyz):
-                colors = plt.cm.jet(edge_colors[i]) # jet color / Already color map is between 0 and 1 so no need for cRange
+                if covType == 'original':
+                    colors = plt.cm.jet(edge_colors[i]) # jet color / Already color map is between 0 and 1 so no need for cRange
+                if covType == 'sig':
+                    colors = 'royalblue'
                 currAx.plot(*vizedge.T, c=colors, alpha = edgeTransparency)
 
             # Plot the Labels
-            showLabels = 1
             if showLabels:
                 for i in range(len(LabelNames)):
                     currAx.text(x=pos[i][0], y=pos[i][1], z=pos[i][2], s=LabelNames[i], fontsize = 6)
@@ -145,7 +148,7 @@ def plotNetwork3(currFig, adjMtx, GIImesh, CoM, LabelNames, cRange, MakerVec, pS
 
         # Plot the 3D Brain surface (Atlas)
         # def plotgiiSurf(giiSurf, valDisp, viewA, viewE, CRange, flipCmap, cmapType, currAx, cmapIn=None):
-        plotgiiSurf(GIImesh['giiSurface_Both'][0,0], surfvalDisp, viewE, viewA, viewR, cRange, 0, 5, currAx, atlasTransparency)
+        # plotgiiSurf(GIImesh['giiSurface_Both'][0,0], surfvalDisp, viewE, viewA, viewR, cRange, 0, 5, currAx, atlasTransparency)
         
         # ----------TESTING----------
         # break

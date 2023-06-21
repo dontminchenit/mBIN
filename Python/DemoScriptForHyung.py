@@ -3,13 +3,14 @@ import scipy.io
 import sys
 
 sys.path.insert(1, "/Users/hyung/Research23_Network_Analysis/mBIN/Python/LBD/")
-import LoadDataLBD
-import PathCovLBD_noAmy
+from LoadDataLBD import loaddataLBD
+from PathCovLBD_noAmy import pathCovLBD_noAmy
+from ThicknessCovLBD import ThicknessCovLBD
 
 sys.path.insert(1, "/Users/hyung/Research23_Network_Analysis/mBIN/Python/NetworkAnalysisGeneral/Code/SupportFunctions/")
 from plotNetwork3 import plotNetwork3
 
-# change these directories to match the folder in your computer's path location of the github respository:
+# change these directories to match the folder in your computer's path location of the github respository / Only used to load the FTDGeneralData_20221114.mat file
 baseDir='/Users/hyung/Research23_Network_Analysis/mBIN/Matlab'
 
 # Location of the data folder
@@ -22,9 +23,12 @@ outputDir='/Users/hyung/Research23_Network_Analysis/NetworkAnalysisData-selected
 NetworkDataGeneral = scipy.io.loadmat(os.path.join(baseDir, 'NetworkAnalysisGeneral', 'FTDGeneralData_20221114.mat'))
 
 # Start by trying to run these script (they're located in the "LBD" folder)
-pathCoM, pathNamesRaw, pathDataGM, LBD_yesADIndx, LBD_noADIndx, sn = LoadDataLBD.loaddataLBD(baseDir, dataDir, outputDir, NetworkDataGeneral)
+pathCoM, pathNamesRaw, pathDataGM, LBD_yesADIndx, LBD_noADIndx, sn, pathLUT, CtrlResults, AllResults, demoT, measuresT_matched = loaddataLBD(baseDir, dataDir, outputDir, NetworkDataGeneral)
 
-PathCovLBD_noAmy.pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathDataGM, LBD_yesADIndx, LBD_noADIndx, sn)
+pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathDataGM, LBD_yesADIndx, LBD_noADIndx, sn)
+
+ThicknessCovLBD(NetworkDataGeneral, pathLUT, CtrlResults, AllResults, demoT, outputDir, measuresT_matched, plotON = True)
+
 
 
 

@@ -5,10 +5,11 @@ from scipy.spatial import Delaunay
 
 # plotgiiSurf(GIImesh['giiSurface_Both'][0,0], surfvalDisp, viewE, viewA, viewR, cRange, 0, 5, currAx)
 def plotgiiSurf(giiSurf, valDisp, viewE, viewA, viewR, cRange, flipCmap, cmapType, currAx, atlasTransparency, cmapIn=None):
-
-    # plots the 3-D triangular surface defined by the points in vectors x, y, and z, and a triangle connectivity matrix T.
-    currAx.plot_trisurf(giiSurf['vertices'][0, 0][:,0], giiSurf['vertices'][0, 0][:,1], giiSurf['vertices'][0, 0][:,2], triangles=(giiSurf['faces'][0, 0]) - 1, facecolor='Gray', edgecolor=None, antialiased = False, alpha=atlasTransparency)
     
+    # plots the 3-D triangular surface defined by the points in vectors x, y, and z, and a triangle connectivity matrix T.
+    #currAx.plot_trisurf(giiSurf['vertices'][0, 0][:,0], giiSurf['vertices'][0, 0][:,1], giiSurf['vertices'][0, 0][:,2], triangles=(giiSurf['faces'][0, 0]) - 1, facecolor='Gray', edgecolor=None, antialiased = False, alpha=atlasTransparency)
+    currAx.plot_trisurf(giiSurf['vertices'][0, 0][:,0], giiSurf['vertices'][0, 0][:,1], giiSurf['vertices'][0, 0][:,2], facecolor='Gray', edgecolor=None, antialiased = False, alpha=atlasTransparency)
+
     # Lightning (NOT IMPLEMENTED YET)
     # lighting = 'flat'
     # for i in range(lightStr):
@@ -25,6 +26,7 @@ def plotgiiSurf(giiSurf, valDisp, viewE, viewA, viewR, cRange, flipCmap, cmapTyp
     #     if cmapType == 1:
     #         c = plt.cm.RdBu_r(np.linspace(0, 1, 100))
     #         c = np.flipud(c)
+    
     #     elif cmapType == 2:
     #         c = plt.cm.Greens(np.linspace(0, 1, 100))
     #     elif cmapType == 3:
@@ -43,9 +45,3 @@ def plotgiiSurf(giiSurf, valDisp, viewE, viewA, viewR, cRange, flipCmap, cmapTyp
     if flipCmap:
         c = np.flipud(c)
         c[0, :] = np.array([1, 1, 1])
-
-
-    currAx.set_xlabel('X')
-    currAx.set_ylabel('Y')
-    currAx.set_zlabel('Z')
-

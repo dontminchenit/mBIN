@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+# findPathCoM(pathLUT, AtlasToPathLUT, NetworkDataGeneral['NetworkDataGeneral'][0,0]['Schaefer400x7']['CoM'][0, 0])
 def findPathCoM(pathLUT, AtlasToPathLUT, AtlasCoM):
     """
     a function to find Center of Mass for Pathology
@@ -46,7 +47,7 @@ def findPathCoM(pathLUT, AtlasToPathLUT, AtlasCoM):
                 # Need to offset by 1 (index difference between matlab and python)
                 atlasIdx = (pathLUT.Label_ID400x7.loc[pathLabelIdx] - 1).to_numpy()
                 
-                pathCoM[l,:,r] = np.nanmean(AtlasCoM[atlasIdx,:], axis=0)
+                pathCoM[l,:,r] = np.nanmean(AtlasCoM[atlasIdx,:], axis=0) # Approximation. Works if the regions are the similar volume. 
                 pathToAtlasIndex[l][r] = atlasIdx
     
     return pathCoM, pathToAtlasIndex

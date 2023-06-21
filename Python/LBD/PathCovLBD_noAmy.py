@@ -11,6 +11,7 @@ import panel as pn
 
 sys.path.insert(1, "/Users/hyung/Research23_Network_Analysis/mBIN/Python/NetworkAnalysisGeneral/Code/SupportFunctions/")
 from plotNetwork3 import plotNetwork3 
+from analysisVisualization import drawCovMatrix
 
 # Helper Function
 def test_corr_sig(corr1, corr2, ncorr1, ncorr2):
@@ -44,12 +45,12 @@ def pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathD
     for i in range(N):
         for j in range(N):
             if i!=j:
-                # Sum of log %AO for two different anatomical regions for with/without AD
+                # Sum of log %AO for two different anatomical regions for with/without AD both not NaN
                 NYesAD = np.sum(~np.isnan(path_yesAD[:,i]) & ~np.isnan(path_yesAD[:,j]))
                 NNoAD = np.sum(~np.isnan(path_noAD[:,i]) & ~np.isnan(path_noAD[:,j]))
 
                 if NYesAD > 3 and NNoAD >3:
-                    # Get the correlation ? covariance ?
+                    # Get the covariance / For only where regions that doesn't have invalid values
                     covMat_yesAD[i,j] = ma.corrcoef(ma.masked_invalid(path_yesAD[:,i]), ma.masked_invalid(path_yesAD[:,j]))[0, 1]
                     covMat_noAD[i,j] = ma.corrcoef(ma.masked_invalid(path_noAD[:,i]), ma.masked_invalid(path_noAD[:,j]))[0, 1]
 
@@ -66,9 +67,8 @@ def pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathD
     covMat_noAD = np.delete(covMat_noAD, 1, axis=1)
     cmpCovYes_gt_No = np.delete(cmpCovYes_gt_No, 1, axis=1)
     cmpCovNo_gt_Yes = np.delete(cmpCovNo_gt_Yes, 1, axis=1)
-    currCoM = np.delete(currCoM, 1, axis=0)
 
-    #----up to here validated-----
+    currCoM = np.delete(currCoM, 1, axis=0)
 
     saveName = 'LBD'
 
@@ -81,99 +81,18 @@ def pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathD
     #sns.set_theme(style="white")
     
     # ---------------------covMat_yesAD--------------------
-    N = covMat_yesAD.shape[0]
-
-    # Generate a mask for the upper triangle
-    mask = np.triu(np.ones_like(covMat_yesAD, dtype=bool))
-
-    # Set up the matplotlib figure
-    f, ax = plt.subplots(figsize=(11, 9))
-
-    # colormap - 'cold' 'hot'
-    cmap = sns.color_palette("coolwarm", as_cmap=True)
-
-    # Draw the heatmap with the mask and correct aspect ratio
-    sns.heatmap(covMat_yesAD, mask=mask, cmap=cmap, vmax=1, vmin=0, center=0.5,
-                square=True, linewidths=.5, xticklabels=pathNamesAdj, yticklabels=pathNamesAdj, cbar_kws={"shrink": .5}, annot=True)
-    
-    # Set figure title
-    plt.title('LBD-yesAD')
-
-    # Save the figure
-    plt.savefig(outputDir + "/CovMat_yesAD.png", dpi=400)
-
+    drawCovMatrix(covMat_yesAD, pathNamesAdj, pathNamesAdj, 'LBD-yesAD', outputDir, "/CovMat_yesAD.png")
 
     # ---------------------covMat_noAD--------------------
-    N = covMat_noAD.shape[0]
-
-    # Generate a mask for the upper triangle
-    mask = np.triu(np.ones_like(covMat_noAD, dtype=bool))
-
-    # Set up the matplotlib figure
-    f, ax = plt.subplots(figsize=(11, 9))
-
-    # colormap - 'cold' 'hot'
-    cmap = sns.color_palette("coolwarm", as_cmap=True)
-
-    # Draw the heatmap with the mask and correct aspect ratio
-    sns.heatmap(covMat_noAD, mask=mask, cmap=cmap, vmax=1, vmin=0, center=0.5,
-                square=True, linewidths=.5, xticklabels=pathNamesAdj, yticklabels=pathNamesAdj, cbar_kws={"shrink": .5}, annot=True)
-    
-    # Set figure title
-    plt.title('LBD-noAD')
-
-    # Save the figure
-    plt.savefig(outputDir + "/covMat_noAD.png", dpi=400)
+    drawCovMatrix(covMat_noAD, pathNamesAdj, pathNamesAdj, 'LBD-noAD', outputDir, "/covMat_noAD.png")
 
     # ---------------------cmpCovNo_gt_Yes--------------------
-    N = cmpCovNo_gt_Yes.shape[0]
-
-    # Generate a mask for the upper triangle
-    mask = np.triu(np.ones_like(cmpCovNo_gt_Yes, dtype=bool))
-
-    # Set up the matplotlib figure
-    f, ax = plt.subplots(figsize=(11, 9))
-
-    # colormap - 'cold' 'hot'
-    cmap = sns.color_palette("coolwarm", as_cmap=True)
-
-    # Draw the heatmap with the mask and correct aspect ratio
-    sns.heatmap(cmpCovNo_gt_Yes, mask=mask, cmap=cmap, vmax=1, vmin=0, center=0.5,
-                square=True, linewidths=.5, xticklabels=pathNamesAdj, yticklabels=pathNamesAdj, cbar_kws={"shrink": .5}, annot=True)
-    
-    # Set figure title
-    plt.title('noAD > yesAD')
-
-    # Save the figure
-    plt.savefig(outputDir + "/" + saveName + "_1TDPGTTAU.png", dpi=400)
+    drawCovMatrix(cmpCovNo_gt_Yes, pathNamesAdj, pathNamesAdj, 'noAD > yesAD', outputDir, "/" + saveName + "_1TDPGTTAU.png")
 
     # ---------------------cmpCovYes_gt_No--------------------
-    N = cmpCovYes_gt_No.shape[0]
+    drawCovMatrix(cmpCovYes_gt_No, pathNamesAdj, pathNamesAdj, 'yesAD > noAD', outputDir, "/" + saveName + "_TAUGTTDP.png")
 
-    # Generate a mask for the upper triangle
-    mask = np.triu(np.ones_like(cmpCovYes_gt_No, dtype=bool))
-
-    # Set up the matplotlib figure
-    f, ax = plt.subplots(figsize=(11, 9))
-
-    # colormap - 'cold' 'hot'
-    cmap = sns.color_palette("coolwarm", as_cmap=True)
-
-    # Draw the heatmap with the mask and correct aspect ratio
-    sns.heatmap(cmpCovYes_gt_No, mask=mask, cmap=cmap, vmax=1, vmin=0, center=0.5,
-                square=True, linewidths=.5, xticklabels=pathNamesAdj, yticklabels=pathNamesAdj, cbar_kws={"shrink": .5}, annot=True)
-    
-    # Set figure title
-    plt.title('yesAD > noAD')
-
-    # Save the figure
-    plt.savefig(outputDir + "/" + saveName + "_TAUGTTDP.png", dpi=400)
-
-    
     # ---------------------LBD_SigPlots--------------------
-    # Use the matplotlib - subplot
-
-    
 #---
     # Log %AO of LBD with/without AD
     path_yesAD_exp = path_yesAD.copy()
@@ -201,7 +120,7 @@ def pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathD
 
     # Define figure
     fig_atlas = plt.figure()
-
+ 
     pSelectCol = 1
     plotNetwork3(fig_atlas, covMat_yesAD, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecYes, pSelectCol, colorVec, 3)
 
@@ -215,10 +134,23 @@ def pathCovLBD_noAmy(outputDir, NetworkDataGeneral, pathCoM, pathNamesRaw, pathD
     plotNetwork3(fig_atlas, cmpCovNo_gt_Yes, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecNo, pSelectCol, colorVec, 3)
 
     fig_atlas.tight_layout()
-    
+
     # Save the figure
-    plt.savefig(outputDir + "/TESTATLAS_TAUGTTDP.png", dpi=1000, bbox_inches='tight')
-    # plt.savefig(outputDir + "/TESTATLAS_TAUGTTDP2.png", dpi=400)
+    plt.savefig(outputDir + "/3D_Atlas_Multiple.png", dpi=1000, bbox_inches='tight')
+
+
+    # ----------TESTING----------
+    # fig_testing = plt.figure()
+
+    # pSelectCol = 1
+    # plotNetwork3(fig_testing, covMat_yesAD, NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVecYes, pSelectCol, colorVec, 3)
+
+    # fig_testing.tight_layout()
+
+    # plt.savefig(outputDir + "/3D_Atlas_Single.png", dpi=1000, bbox_inches='tight')
+    # ----------TESTING----------
+
+
 
 # Solid mesh --> Map the dots on the surface, not transparent
 ###
