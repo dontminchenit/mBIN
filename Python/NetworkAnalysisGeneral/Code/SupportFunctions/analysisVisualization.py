@@ -6,6 +6,32 @@ from scipy import stats
 import seaborn as sns
 from PIL import Image
 
+def drawCovMatrix(covMat, x_labels, y_labels, title, outputDir, outputName, annot_fontsize = 8, tick_fontsize = 6, annot_bool = True):
+    # Dimension(one side) of the covariance matrix
+    N = covMat.shape[0]
+
+    # Generate a mask for the upper triangle
+    mask = np.triu(np.ones_like(covMat, dtype=bool))
+
+    # Set up the matplotlib figure
+    f, ax = plt.subplots()
+
+    # colormap - 'cold' 'hot'
+    cmap = sns.color_palette("coolwarm", as_cmap=True)
+    
+    # Draw the heatmap with the mask and correct aspect ratio
+    sns.heatmap(covMat, mask=mask, cmap=cmap, vmax=1, vmin=0, center=0.5,
+                square=True, linewidths=.5, xticklabels=x_labels, yticklabels=y_labels, cbar_kws={"shrink": .5}, annot=annot_bool, annot_kws={"size": annot_fontsize}, fmt='.2f')
+    
+    plt.xticks(fontsize=tick_fontsize)
+    plt.yticks(fontsize=tick_fontsize)
+
+    # Set figure title
+    plt.title(title)
+
+    # Save the figure
+    plt.savefig(os.path.join(outputDir, outputName), dpi=400)
+    
 def drawScatterplot(x, y, x_label, y_label, title, outputDir, outputName, linear_regression = False):
     # create scatterplot / empty circle with blue edges
     plt.scatter(x, y, facecolors='none', edgecolors='b')
@@ -137,31 +163,7 @@ def nonZeroDegCorr(ctrl, thickyesAD, thicknoAD, covMatCtrl, covMatyesAD, covMatn
     fig.savefig(os.path.join(outputDir, outputName), dpi=400, format='tif')
 
 
-def drawCovMatrix(covMat, x_labels, y_labels, title, outputDir, outputName, annot_fontsize = 8, tick_fontsize = 6, annot_bool = True):
-    # Dimension(one side) of the covariance matrix
-    N = covMat.shape[0]
 
-    # Generate a mask for the upper triangle
-    mask = np.triu(np.ones_like(covMat, dtype=bool))
-
-    # Set up the matplotlib figure
-    f, ax = plt.subplots()
-
-    # colormap - 'cold' 'hot'
-    cmap = sns.color_palette("coolwarm", as_cmap=True)
-    
-    # Draw the heatmap with the mask and correct aspect ratio
-    sns.heatmap(covMat, mask=mask, cmap=cmap, vmax=1, vmin=0, center=0.5,
-                square=True, linewidths=.5, xticklabels=x_labels, yticklabels=y_labels, cbar_kws={"shrink": .5}, annot=annot_bool, annot_kws={"size": annot_fontsize}, fmt='.2f')
-    
-    plt.xticks(fontsize=tick_fontsize)
-    plt.yticks(fontsize=tick_fontsize)
-
-    # Set figure title
-    plt.title(title)
-
-    # Save the figure
-    plt.savefig(os.path.join(outputDir, outputName), dpi=400)
 
 def get_concat_h(im1, im2):
     dst = Image.new('RGB', (im1.width + im2.width, im1.height))

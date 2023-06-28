@@ -8,6 +8,210 @@ import matplotlib.pyplot as plt
 import os
 import networkx as nx
 import pickle
+import sys
+from PIL import Image
+
+sys.path.insert(1, "/Users/hyung/Research23_Network_Analysis/mBIN/Python/NetworkAnalysisGeneral/Code/SupportFunctions/")
+from plotNetwork3_Individual import plotNetwork3Individual
+from analysisVisualization import cropImg4
+
+def test_corr_sig(corr1, corr2, ncorr1, ncorr2):
+    """Statistical tool for calculating the corr significance
+
+    Args:
+        corr1 (float): covariance value of covMat1 [i, j]
+        corr2 (float): covariance value of covMat2 [i, j]
+        ncorr1 (int): number of non-Nan observations for covMat1 at [i, j]
+        ncorr2 (int): number of non-Nan observations for covMat2 at [i, j]
+
+    Returns:
+        probs (float): pvalue
+        z_obs (float): _description_
+    """
+    z_corr1 = np.arctanh(corr1)
+    z_corr2 = np.arctanh(corr2)
+    z_obs = (z_corr1 - z_corr2) / ((1 / (ncorr1 - 3)) + (1 / (ncorr2 - 3))) ** 0.5
+    probs = norm.cdf(z_obs)
+    return probs, z_obs
+
+def save3DGraph(adjMtx, outputDir, filename):
+    """save Graph as obj that we are mapping to 3D
+
+    Args:
+        adjMtx (ndarray): adjacency matrix we use to generate the Graph obj
+        outputDir (str): Path location to save the analysis results
+        filename (str): Name of the file we are saving
+    """
+    # Substitute NaN values to 0
+    adjMtx[np.isnan(adjMtx)] = 0
+
+    # Get upper triangle of adjMtx
+    adjMtx = np.triu(adjMtx)
+
+    # Get graph of adjMtx
+    G = nx.Graph(adjMtx)
+
+    # save graph object to file
+    pickle.dump(G, open(outputDir + '/Graph_Objects/' + filename + '.pickle', 'wb'))
+
+################################################################## PATHOLOGY PART ##################################################################
+def pathObsThresh(TAUData, TDPData, obs_thresh):
+    """Find the list Region index where there are less than pre-defined observation count (for both TAU and TDP)
+
+    Args:
+        TAUData (ndarray): log %AO of TAU Pathology Data
+        TDPData (ndarray): log %AO of TDP Pathology Data
+        obs_thresh (int): PreDefined observation count. Any regions' observation less than this value would be dicarded
+    
+    Returns:
+        TAU_missing_index (int list): list of index from the LabelNames that we are not mapping to 3D Atlas due to lacking observations count (for TAU)
+        TDP_missing_index (int list): list of index from the LabelNames that we are not mapping to 3D Atlas due to lacking observations count (for TDP)
+    """
+     # Get list containing number of observed subjects per region (list of length 40) / TAU and TDP
+    obs_TAU = []
+    obs_TDP = []
+
+    for t in range(TAUData.shape[1]): # iterate over the rows of the 2d array / 40
+        non_nan_count = np.count_nonzero(~np.isnan(TAUData[:, t])) # Number of Non-NaN in this column
+        obs_TAU.append(non_nan_count)
+    
+    for t in range(TDPData.shape[1]):
+        non_nan_count = np.count_nonzero(~np.isnan(TDPData[:, t])) # Number of Non-NaN in this column
+        obs_TDP.append(non_nan_count)
+
+    # TO numpy array
+    obs_TAU = np.array(obs_TAU)
+    obs_TDP = np.array(obs_TDP)   
+    
+    TAU_missing_index = np.argwhere(obs_TAU < obs_thresh).flatten()
+    TDP_missing_index = np.argwhere(obs_TDP < obs_thresh).flatten()
+
+    return TAU_missing_index, TDP_missing_index
+
+def pathCovGen(TAUData, TDPData, pthresh, cov_thresh):
+    """Function that calculates covariance matrix(s) for pathology dataset.
+    4 Cov Mat
+    1) TAU
+    2) TDP
+    3) TAU_gt_TDP
+    4) TDP_gt_TAU
+
+    Args:
+        TAUData (ndarray): log %AO of TAU Pathology Data
+        TDPData (ndarray): log %AO of TDP Pathology Data
+        pthresh (float): p-value threshold
+        cov_thresh (float): covariance matrix threshold (just to make suere there is no noise)
+
+    Returns:
+        [covTAU, covTDP, covTAU_gt_TDP, covTDP_gt_TAU] (list of ndarray): list of 4 cov mat we calculated
+    """
+    # Sanity Check
+    assert(TAUData.shape[1] == TDPData.shape[1])
+
+    # Define N (Number of regions)
+    N = TAUData.shape[1]
+
+    # Covariance matrix for TAU
+    covTAU= np.full((N,N), np.nan)
+
+    # Covariance matrix for TDP
+    covTDP= np.full((N,N), np.nan)
+
+    # For Significance difference in Covariance value
+    covTAU_gt_TDP = np.full((N,N), np.nan)
+    covTDP_gt_TAU = np.full((N,N), np.nan)
+
+    for i in range(N):
+        for j in range(N):
+            if i!=j:
+                # Sum of log %AO for two different anatomical regions for TAU/TDP both not NaN
+                nTAU = np.sum(~np.isnan(TAUData[:,i]) & ~np.isnan(TAUData[:,j]))
+                nTDP = np.sum(~np.isnan(TDPData[:,i]) & ~np.isnan(TDPData[:,j]))
+                
+                if nTAU > 3:
+                    covTAU[i, j] = ma.corrcoef(ma.masked_invalid(TAUData[:,i]), ma.masked_invalid(TAUData[:,j]))[0, 1]
+                    if covTAU[i, j] < cov_thresh:
+                        covTAU[i, j] = np.nan
+                        nTAU = 0
+
+                if nTDP > 3:
+                    covTDP[i, j] = ma.corrcoef(ma.masked_invalid(TDPData[:,i]), ma.masked_invalid(TDPData[:,j]))[0, 1]
+                    if covTDP[i, j] < cov_thresh:
+                        covTDP[i, j] = np.nan
+                        nTDP = 0
+
+                if nTAU > 3 and nTDP >3:
+                    covTAU_gt_TDP[i,j] = test_corr_sig(covTDP[i,j],covTAU[i,j],nTDP,nTAU)[0] < pthresh 
+                    covTDP_gt_TAU[i,j] = test_corr_sig(covTAU[i,j],covTDP[i,j],nTAU,nTDP)[0] < pthresh
+
+    return [covTAU, covTDP, covTAU_gt_TDP, covTDP_gt_TAU]
+
+def path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, MarkerVecTAU, colorVecTAU, CoM_TDP, pathNames_TDP, MarkerVecTDP, colorVecTDP, cRange, outputDir, suffix_M):
+    """3D mapping of the Pathology Data Analysis
+
+    Args:
+        covMatlist (list of ndarray): list of 4 cov mat we calculated for pathology dataset
+        NetworkDataGeneral (obj): Preconstructed atlas data
+        CoM_TAU (ndarray): Center of Mass of Pathology Regions (matched for regions we excluded based on observation threshold for TAU)
+        pathNames_TAU (str list): list of pathology regions we map to 3D Atlas (matched for regions we excluded based on observation threshold for TAU)
+        MarkerVecTAU (ndarray): vector denoting the node size of our 3D Mapped Network (for TAU)
+        colorVecTAU (ndarray): vector denoting the node color of our 3D Mapped Network (for TAU)
+        CoM_TDP (ndarray): Center of Mass of Pathology Regions (matched for regions we excluded based on observation threshold for TDP)
+        pathNames_TDP (str list): list of pathology regions we map to 3D Atlas (matched for regions we excluded based on observation threshold for TDP)
+        MarkerVecTDP (ndarray): vector denoting the node size of our 3D Mapped Network (for TDP)
+        colorVecTDP (ndarray): vector denoting the node color of our 3D Mapped Network (for TDP)
+        cRange (int list): list containing the max min value of Network edge
+        outputDir (str): Path location to save the analysis results
+        suffix_M (str): Suffix denoting if the analysis is on GM or WM
+    """
+    # Images to Crop
+    TAU_img = None
+    TDP_img = None
+    TAU_GT_TDP_img = None
+    TDP_GT_TAU_img = None
+
+    covMatNamelist = ['CovMat_FTD_TAU', 'CovMat_FTD_TDP', 'FTD_TAU_GT_TDP', 'FTD_TDP_GT_TAU']
+    imglist = [TAU_img, TDP_img, TAU_GT_TDP_img, TDP_GT_TAU_img]
+    for j in range(len(covMatlist)):
+        # Define figure
+        fig_atlas = plt.figure()
+
+        if j == 0 or j == 2: # TAU part
+            currPathCoM = CoM_TAU
+            currLabelNames = pathNames_TAU
+            currMarkerVec = MarkerVecTAU
+            currColorVec = colorVecTAU
+        else: # TDP part
+            currPathCoM = CoM_TDP
+            currLabelNames = pathNames_TDP
+            currMarkerVec = MarkerVecTDP
+            currColorVec = colorVecTDP
+        
+        # Set edge color type (Original - jet / sig - all red)
+        if j == 0 or j == 1:
+            covType = 'original'
+        else:
+            covType = 'sig'
+
+        # covMat_TAU, covMat_TDP, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU
+        plotNetwork3Individual(fig_atlas, covMatlist[j], NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currPathCoM, currLabelNames, cRange, currMarkerVec, currColorVec, 3, showLabels = 0, covType = covType)
+
+        fig_atlas.tight_layout()
+
+        # Save Graph Object
+        save3DGraph(covMatlist[j], outputDir, covMatNamelist[j] + suffix_M)
+
+        # Save the figure
+        plt.savefig(outputDir + '/3D_Atlas_' + covMatNamelist[j] + suffix_M, dpi=1000, bbox_inches='tight')
+
+        # Read figure to crop
+        imglist[j] = Image.open(outputDir + '/3D_Atlas_' + covMatNamelist[j] + suffix_M + '.png')
+        
+        
+    comb_img = cropImg4(imglist)
+    comb_img.save(outputDir + f'/FTD{suffix_M}.png')
+
+####################################################################################################################################################
 
 def sexLUT(sexstr):
     if sexstr == 'Male':
@@ -24,12 +228,7 @@ def sliceCovMat(covMat, colList):
     return covMat[np.ix_(colList, colList)]
 
 # Helper Functions
-def test_corr_sig(corr1, corr2, ncorr1, ncorr2):
-    z_corr1 = np.arctanh(corr1)
-    z_corr2 = np.arctanh(corr2)
-    z_obs = (z_corr1 - z_corr2) / ((1 / (ncorr1 - 3)) + (1 / (ncorr2 - 3))) ** 0.5
-    probs = norm.cdf(z_obs)
-    return probs, z_obs
+
 
 def thicknessCovMatGenerate_SigEdgesTSave(N, HCData, TAUData, TDPData, pthresh, cov_thresh, outputDir, networkNames, regNames, pathNames, ii):
     
@@ -501,19 +700,7 @@ def drawthicknessboxplot(HCData, TAUData, TDPData, x_label, y_label, title, outp
     # save figure
     fig.savefig(os.path.join(outputDir, outputName), dpi=400, format='tif')
 
-def save3DGraph(adjMtx, outputDir, filename):
 
-    # Substitute NaN values to 0
-    adjMtx[np.isnan(adjMtx)] = 0
-
-    # Get upper triangle of adjMtx
-    adjMtx = np.triu(adjMtx)
-
-    # Get graph of adjMtx
-    G = nx.Graph(adjMtx)
-
-    # save graph object to file
-    pickle.dump(G, open(outputDir + '/Graph_Objects/' + filename + '.pickle', 'wb'))
 
 
 def fixedDensity(covMat, N):
