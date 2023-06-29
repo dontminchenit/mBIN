@@ -10,10 +10,11 @@ import networkx as nx
 import pickle
 import sys
 from PIL import Image
+from itertools import compress
 
 sys.path.insert(1, "/Users/hyung/Research23_Network_Analysis/mBIN/Python/NetworkAnalysisGeneral/Code/SupportFunctions/")
 from plotNetwork3_Individual import plotNetwork3Individual
-from analysisVisualization import cropImg4
+from analysisVisualization import cropImg4, cropImg6
 
 def test_corr_sig(corr1, corr2, ncorr1, ncorr2):
     """Statistical tool for calculating the corr significance
@@ -213,278 +214,93 @@ def path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, Marker
 
 ####################################################################################################################################################
 
-def sexLUT(sexstr):
-    if sexstr == 'Male':
-        return 0
-    elif sexstr == 'Female':
-        return 1
-    else:
-        raise Exception("Problem with converting sex to integer")
-
-def sexToBinary(listOfValues):
-    return [sexLUT(i) for i in listOfValues]
-
-def sliceCovMat(covMat, colList):
-    return covMat[np.ix_(colList, colList)]
-
-# Helper Functions
 
 
-def thicknessCovMatGenerate_SigEdgesTSave(N, HCData, TAUData, TDPData, pthresh, cov_thresh, outputDir, networkNames, regNames, pathNames, ii):
+################################################################## THICKNESS PART ##################################################################
+def thickSelectNetwork(networkNames, ii, pathLUT):
+    """Select Specific Thickness Network we want to analyze.
+    From networkNames=['DorsAttn','VentAttn','Limbic','SomMot','Default','Cont','_Vis_','All']
+
+    Args:
+        networkNames (str list): list of thickness Network we want to analyze
+        ii (int): index to choose from networkNames
+        pathLUT (DataFrame): Look up table matching Atlas region names to Atlas Labels (Index) in NetworkDataGeneral Object
+
+    Returns:
+        currNetwork (bool list): List of Boolean denoting if Label_Name2_list contains specified networkNames or not / Boolean list of length 400 / in order of Label_Name2_List
+        saveName (str): string name of the thickness network we choose
+        regNames (str list): Thickness Region Names that are in the specific network we choose (in order of the 400 regions)
+        pathNames (str list): Pathology Region Names that matches to regNames (in order of the 400 regions)
+        N (int):  Number of Regions we are analyzing in specified thickness Network / N = len(regNames)
+    """
+
+    ########################################################### Variable Summary ######################################################################
+    # Label_Name2_list: Names of 400 Regions in the Schaffer Atlas (in order with numlab = 400)
+    # currNetwork: List of Boolean denoting if Label_Name2_list contains specified networkNames or not / Boolean list of length 400 / in order of Label_Name2_List
+    # pathLUTSorted: Sort the pathology LUT by Label_ID400x7 1 to 400 / LUT matching 400 thickness regions to PathName
+    # regNames: Thickness Region Names that are in the specific network we choose (in order of the 400 regions)
+    # pathNames: Pathology Region Names that matches to regNames (in order of the 400 regions)
+    # N: Number of Regions we are analyzing in specified thickness Network / N = len(regNames)
+    ###################################################################################################################################################
+
+    # Due to mat file issues, loading Label_Name2 from txt file / list of length 400 --> Names of 400 Regions in the Schaffer Atlas (in order)
+    with open('/Users/hyung/Research23_Network_Analysis/mBIN/Python/LBD/NetworkDataGeneral_Schaefer400x7_LUT_Label_Name2.txt') as file:
+        Label_Name2_list = [line.rstrip() for line in file]
+        file.close()
     
-    # 1000 rows for now
-    NN = 1000
+    if(ii == 8): # Since it's All we set all values to 1 (True) in currNetwork
+        currNetwork = np.ones(len(Label_Name2_list), dtype=bool)
+    else: # NetworkName --> 'Default' (ii = 5)
+        # currNetwork: List of Boolean denoting if Label_Name2_list contains networkNames('Default') or not / Boolean list of length 400
+        currNetwork = np.array([networkNames[ii - 1] in label_name for label_name in Label_Name2_list], dtype=bool) # -1 added because of index difference between python and matlab
 
-    # Create a Pandas Dataframe of 1000 rows x 13 columns (Initally all empty - NaN)
-    NetworkNames = [np.nan for _ in range(NN)]
-    ROIName1 = [np.nan for _ in range(NN)]
-    ROIName1_Path = [np.nan for _ in range(NN)]
-    ROIName2 = [np.nan for _ in range(NN)]
-    ROIName2_Path = [np.nan for _ in range(NN)]
-    r_YesAD = [np.nan for _ in range(NN)]
-    r_NoAD = [np.nan for _ in range(NN)]
-    N_YesAD = [np.nan for _ in range(NN)]
-    N_NoAD = [np.nan for _ in range(NN)]
-    z_YesAD_gt_NoAD = [np.nan for _ in range(NN)]
-    z_NoAD_gt_YesAD = [np.nan for _ in range(NN)]
-    p_YesAD_gt_NoAD = [np.nan for _ in range(NN)]
-    p_NoAD_gt_YesAD = [np.nan for _ in range(NN)]
+    # saveName --> this specific case: 'Default' / 'All'
+    saveName = networkNames[ii - 1] # -1 added because of index difference between python and matlab
 
-    SigEdgesT = pd.DataFrame({'NetworkNames': NetworkNames, 'ROIName1': ROIName1, 'ROIName1_Path': ROIName1_Path, 'ROIName2': ROIName2, 'ROIName2_Path': ROIName2_Path, 'r_YesAD': r_YesAD, 'r_NoAD': r_NoAD, 'N_YesAD': N_YesAD, 'N_NoAD': N_NoAD, 'z_YesAD_gt_NoAD': z_YesAD_gt_NoAD, 'z_NoAD_gt_YesAD': z_NoAD_gt_YesAD, 'p_YesAD_gt_NoAD': p_YesAD_gt_NoAD, 'p_NoAD_gt_YesAD': p_NoAD_gt_YesAD})
-    SigEdgesCounter = 0
-
-    # N --> Number of Regions to generate cov Mat
-    covMatHC = np.full((N,N), np.nan)
-    covMatTAU = np.full((N,N), np.nan)
-    covMatTDP = np.full((N,N), np.nan)
-
-    cmpCovTAU_gt_HC = np.full((N,N), np.nan)
-    cmpCovTDP_gt_HC = np.full((N,N), np.nan)
-
-    cmpCovTAU_lt_HC = np.full((N,N), np.nan)
-    cmpCovTDP_lt_HC = np.full((N,N), np.nan)
-
-    cmpCovTAU_gt_TDP = np.full((N,N), np.nan)
-    cmpCovTDP_gt_TAU = np.full((N,N), np.nan)
-
-    cmpCovTAU_gt_HC_raw = np.full((N,N), np.nan)
-    cmpCovTDP_gt_HC_raw = np.full((N,N), np.nan)
-
-    cmpCovTAU_lt_HC_raw = np.full((N,N), np.nan)
-    cmpCovTDP_lt_HC_raw = np.full((N,N), np.nan)
-
-    cmpCovTAU_gt_TDP_raw = np.full((N,N), np.nan)
-    cmpCovTDP_gt_TAU_raw = np.full((N,N), np.nan)
-
-    for i in range(N):
-        for j in range(N):
-
-            if i != j: # When it's not the same region in the current Network
-                nHC = np.sum(~np.isnan(HCData[:, i]) & ~np.isnan(HCData[:, j])) # Get the sum of regions that are not NaN
-                nTAU = np.sum(~np.isnan(TAUData[:, i]) & ~np.isnan(TAUData[:, j])) # Get the sum of regions that are not NaN
-                nTDP = np.sum(~np.isnan(TDPData[:, i]) & ~np.isnan(TDPData[:, j])) # Get the sum of regions that are not NaN
-
-                if nHC > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
-                    covMatHC[i, j] = ma.corrcoef(ma.masked_invalid(HCData[:,i]), ma.masked_invalid(HCData[:,j]))[0, 1]
-                    if covMatHC[i, j] < cov_thresh:
-                        covMatHC[i, j] = np.nan
-                        nHC = 0 # reset for below case
-
-                if nTAU > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
-                    covMatTAU[i, j] = ma.corrcoef(ma.masked_invalid(TAUData[:,i]), ma.masked_invalid(TAUData[:,j]))[0, 1]
-                    if covMatTAU[i, j] < cov_thresh:
-                        covMatTAU[i, j] = np.nan
-
-                if nTDP > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
-                    covMatTDP[i, j] = ma.corrcoef(ma.masked_invalid(TDPData[:,i]), ma.masked_invalid(TDPData[:,j]))[0, 1]
-                    if covMatTDP[i, j] < cov_thresh:
-                        covMatTDP[i, j] = np.nan
-
-                if nHC > 3 and nTAU > 3: 
-                    cmpCovTAU_gt_HC[i, j] = test_corr_sig(covMatHC[i, j], covMatTAU[i, j], nHC, nTAU)[0] < pthresh # get only probs
-                    cmpCovTAU_lt_HC[i, j] = test_corr_sig(covMatTAU[i, j], covMatHC[i, j], nTAU, nHC)[0] < pthresh # get only probs
-
-                    cmpCovTAU_gt_HC_raw[i, j] = test_corr_sig(covMatHC[i, j], covMatTAU[i, j], nHC, nTAU)[0] # get raw sig value
-                    cmpCovTAU_lt_HC_raw[i, j] = test_corr_sig(covMatTAU[i, j], covMatHC[i, j], nTAU, nHC)[0] # get raw sig value
-
-                if nHC > 3 and nTDP > 3: 
-                    cmpCovTDP_gt_HC[i, j] = test_corr_sig(covMatHC[i, j], covMatTDP[i, j], nHC, nTDP)[0] < pthresh # get only probs
-                    cmpCovTDP_lt_HC[i, j] = test_corr_sig(covMatTDP[i, j], covMatHC[i, j], nTDP, nHC)[0] < pthresh # get only probs
-
-                    cmpCovTDP_gt_HC_raw[i, j] = test_corr_sig(covMatHC[i, j], covMatTDP[i, j], nHC, nTDP)[0] 
-                    cmpCovTDP_lt_HC_raw[i, j] = test_corr_sig(covMatTDP[i, j], covMatHC[i, j], nTDP, nHC)[0] 
-
-                if nTAU > 3 and nTDP > 3:
-                    cmpCovTAU_gt_TDP[i, j] = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)[0] < pthresh # get only probs
-                    cmpCovTDP_gt_TAU[i, j] = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)[0] < pthresh # get only probs
-
-                    cmpCovTAU_gt_TDP_raw[i, j] = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)[0] 
-                    cmpCovTDP_gt_TAU_raw[i, j] = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)[0] 
-                
-
-                # Fill in the SigEdgesT pandas dataframe we created earlier
-                # When there is a significance diff between TAU AND TDP
-                if (cmpCovTAU_gt_TDP[i, j] == 1 or cmpCovTDP_gt_TAU[i, j] == 1) and i < j: # record significant edges
-                    SigEdgesCounter += 1 # increase SigEdgesCounter
-                    ss = SigEdgesCounter - 1 # index difference between matlab and python
-
-                    SigEdgesT.at[ss, 'NetworkNames'] = networkNames[ii - 1] # index difference between matlab and python
-                    SigEdgesT.at[ss, 'ROIName1'] = regNames[i]
-                    SigEdgesT.at[ss, 'ROIName1_Path'] = pathNames[i] # NaN is obmitted         
-                    SigEdgesT.at[ss, 'ROIName2'] = regNames[j]
-                    SigEdgesT.at[ss, 'ROIName2_Path'] = pathNames[j] # NaN is obmitted 
-                    SigEdgesT.at[ss, 'r_YesAD'] = ma.corrcoef(ma.masked_invalid(TAUData[:,i]), ma.masked_invalid(TAUData[:,j]))[0, 1]
-                    SigEdgesT.at[ss, 'r_NoAD'] = ma.corrcoef(ma.masked_invalid(TDPData[:,i]), ma.masked_invalid(TDPData[:,j]))[0, 1]
-                    SigEdgesT.at[ss, 'N_YesAD'] = nTAU
-                    SigEdgesT.at[ss, 'N_NoAD'] = nTDP
-
-                    p, z = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)
-                    SigEdgesT.at[ss, 'p_YesAD_gt_NoAD'] = p
-                    SigEdgesT.at[ss, 'z_YesAD_gt_NoAD'] = z
-
-                    p, z = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)
-                    SigEdgesT.at[ss, 'p_NoAD_gt_YesAD'] = p
-                    SigEdgesT.at[ss, 'z_NoAD_gt_YesAD'] = z
+    # Sort the pathology LUT by Label_ID400x7
+    pathLUTSorted = pathLUT.sort_values(by=['Label_ID400x7']) # Sort by label 1 to 400
     
+    # Get the PathNames of the current Network inside the pathLUTSorted dataset as list / Out of 400 Regions there are 91 regions that contains 'Default'
+    pathNames = pathLUTSorted[currNetwork]['PathName'].tolist()
+    
+    # Get the Label_Name2 that contains current Network ('Default') as list
+    regNamesRaw = list(compress(Label_Name2_list, currNetwork))
+    
+    # N number of Thickness Regions we are analyzing for this specific network
+    N = len(regNamesRaw)
 
-    # Save SigEdgesT as csv
-    SigEdgesT.to_csv(outputDir + "/SigEdges_FTD.csv")  
+    # Change the regNamesRaw (_ to -)
+    regNames = []
 
-    return [covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU, cmpCovTAU_gt_HC_raw, cmpCovTDP_gt_HC_raw, cmpCovTAU_lt_HC_raw, cmpCovTDP_lt_HC_raw, cmpCovTAU_gt_TDP_raw, cmpCovTDP_gt_TAU_raw]
+    for j in range(N):
+        nameSplit = regNamesRaw[j].replace('_', '-')
+        regNames.append(nameSplit)
 
-def thicknessCovMatGenerate(N, HCData, TAUData, TDPData, pthresh, cov_thresh):
+    # Sanity Check
+    if ii == 5:
+        assert(N == 91)
+    else: # ii == 8
+        assert(N == 400)
 
-    # N --> Number of Regions to generate cov Mat
-    covMatHC = np.full((N,N), np.nan)
-    covMatTAU = np.full((N,N), np.nan)
-    covMatTDP = np.full((N,N), np.nan)
+    return currNetwork, saveName, regNames, pathNames, N
 
-    cmpCovTAU_gt_HC = np.full((N,N), np.nan)
-    cmpCovTDP_gt_HC = np.full((N,N), np.nan)
+def generateZScore(HCData, TAUData, TDPData):
+    """Generate Z Scores for HC/TAU/TDP Data
 
-    cmpCovTAU_lt_HC = np.full((N,N), np.nan)
-    cmpCovTDP_lt_HC = np.full((N,N), np.nan)
+    Args:
+        HCData (ndarray): HC data
+        TAUData (ndarray): TAU data
+        TDPData (ndarray): TDP data
 
-    cmpCovTAU_gt_TDP = np.full((N,N), np.nan)
-    cmpCovTDP_gt_TAU = np.full((N,N), np.nan)
+    Returns:
+        HC_z (float): HC Z Score
+        TAU_z (float): TAU Z Score
+        TDP_z (float): TDP Z Score
+    """
+    # Get Mean/STD of the thickness values for HC / Mean, STD of HC for each 400 regions / 1 x 400
+    hc_Mean = np.nanmean(HCData, axis=0)
+    hc_SD = np.nanstd(HCData, axis=0, ddof=0) # ddof parameter is set to 0, which specifies that the divisor should be N, where N is the number of non-NaN elements in the array
 
-    cmpCovTAU_gt_HC_raw = np.full((N,N), np.nan)
-    cmpCovTDP_gt_HC_raw = np.full((N,N), np.nan)
-
-    cmpCovTAU_lt_HC_raw = np.full((N,N), np.nan)
-    cmpCovTDP_lt_HC_raw = np.full((N,N), np.nan)
-
-    cmpCovTAU_gt_TDP_raw = np.full((N,N), np.nan)
-    cmpCovTDP_gt_TAU_raw = np.full((N,N), np.nan)
-
-    for i in range(N):
-        for j in range(N):
-
-            if i != j: # When it's not the same region in the current Network
-                nHC = np.sum(~np.isnan(HCData[:, i]) & ~np.isnan(HCData[:, j])) # Get the sum of regions that are not NaN
-                nTAU = np.sum(~np.isnan(TAUData[:, i]) & ~np.isnan(TAUData[:, j])) # Get the sum of regions that are not NaN
-                nTDP = np.sum(~np.isnan(TDPData[:, i]) & ~np.isnan(TDPData[:, j])) # Get the sum of regions that are not NaN
-
-                if nHC > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
-                    covMatHC[i, j] = ma.corrcoef(ma.masked_invalid(HCData[:,i]), ma.masked_invalid(HCData[:,j]))[0, 1]
-                    if covMatHC[i, j] < cov_thresh:
-                        covMatHC[i, j] = np.nan
-                        nHC = 0 # reset for below case
-
-                if nTAU > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
-                    covMatTAU[i, j] = ma.corrcoef(ma.masked_invalid(TAUData[:,i]), ma.masked_invalid(TAUData[:,j]))[0, 1]
-                    if covMatTAU[i, j] < cov_thresh:
-                        covMatTAU[i, j] = np.nan
-
-                if nTDP > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
-                    covMatTDP[i, j] = ma.corrcoef(ma.masked_invalid(TDPData[:,i]), ma.masked_invalid(TDPData[:,j]))[0, 1]
-                    if covMatTDP[i, j] < cov_thresh:
-                        covMatTDP[i, j] = np.nan
-
-                if nHC > 3 and nTAU > 3: 
-                    cmpCovTAU_gt_HC[i, j] = test_corr_sig(covMatHC[i, j], covMatTAU[i, j], nHC, nTAU)[0] < pthresh # get only probs
-                    cmpCovTAU_lt_HC[i, j] = test_corr_sig(covMatTAU[i, j], covMatHC[i, j], nTAU, nHC)[0] < pthresh # get only probs
-
-                    cmpCovTAU_gt_HC_raw[i, j] = test_corr_sig(covMatHC[i, j], covMatTAU[i, j], nHC, nTAU)[0] # get raw sig value
-                    cmpCovTAU_lt_HC_raw[i, j] = test_corr_sig(covMatTAU[i, j], covMatHC[i, j], nTAU, nHC)[0] # get raw sig value
-
-                if nHC > 3 and nTDP > 3: 
-                    cmpCovTDP_gt_HC[i, j] = test_corr_sig(covMatHC[i, j], covMatTDP[i, j], nHC, nTDP)[0] < pthresh # get only probs
-                    cmpCovTDP_lt_HC[i, j] = test_corr_sig(covMatTDP[i, j], covMatHC[i, j], nTDP, nHC)[0] < pthresh # get only probs
-
-                    cmpCovTDP_gt_HC_raw[i, j] = test_corr_sig(covMatHC[i, j], covMatTDP[i, j], nHC, nTDP)[0] 
-                    cmpCovTDP_lt_HC_raw[i, j] = test_corr_sig(covMatTDP[i, j], covMatHC[i, j], nTDP, nHC)[0] 
-
-                if nTAU > 3 and nTDP > 3:
-                    cmpCovTAU_gt_TDP[i, j] = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)[0] < pthresh # get only probs
-                    cmpCovTDP_gt_TAU[i, j] = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)[0] < pthresh # get only probs
-
-                    cmpCovTAU_gt_TDP_raw[i, j] = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)[0] 
-                    cmpCovTDP_gt_TAU_raw[i, j] = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)[0] 
-
-    return [covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU, cmpCovTAU_gt_HC_raw, cmpCovTDP_gt_HC_raw, cmpCovTAU_lt_HC_raw, cmpCovTDP_lt_HC_raw, cmpCovTAU_gt_TDP_raw, cmpCovTDP_gt_TAU_raw]
-
-def thicknessCovMatGenerateAtPath(N, HCData, TAUData, TDPData, pthresh, cov_thresh):
-
-    # N --> Number of Regions to generate cov Mat
-    covMatHC = np.full((N,N), np.nan)
-    covMatTAU = np.full((N,N), np.nan)
-    covMatTDP = np.full((N,N), np.nan)
-
-    cmpCovTAU_gt_HC = np.full((N,N), np.nan)
-    cmpCovTDP_gt_HC = np.full((N,N), np.nan)
-
-    cmpCovTAU_lt_HC = np.full((N,N), np.nan)
-    cmpCovTDP_lt_HC = np.full((N,N), np.nan)
-
-    cmpCovTAU_gt_TDP = np.full((N,N), np.nan)
-    cmpCovTDP_gt_TAU = np.full((N,N), np.nan)
-
-    for i in range(N):
-        for j in range(N):
-
-            if i != j: # When it's not the same region in the current Network
-                nHC = np.sum(~np.isnan(HCData[:, i]) & ~np.isnan(HCData[:, j])) # Get the sum of regions that are not NaN
-                nTAU = np.sum(~np.isnan(TAUData[:, i]) & ~np.isnan(TAUData[:, j])) # Get the sum of regions that are not NaN
-                nTDP = np.sum(~np.isnan(TDPData[:, i]) & ~np.isnan(TDPData[:, j])) # Get the sum of regions that are not NaN
-
-                if nHC > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
-                    covMatHC[i, j] = ma.corrcoef(ma.masked_invalid(HCData[:,i]), ma.masked_invalid(HCData[:,j]))[0, 1]
-                    if covMatHC[i, j] < cov_thresh:
-                        covMatHC[i, j] = np.nan
-                        nHC = 0 # reset for below case
-
-                if nTAU > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
-                    covMatTAU[i, j] = ma.corrcoef(ma.masked_invalid(TAUData[:,i]), ma.masked_invalid(TAUData[:,j]))[0, 1]
-                    if covMatTAU[i, j] < cov_thresh:
-                        covMatTAU[i, j] = np.nan
-
-                if nTDP > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
-                    covMatTDP[i, j] = ma.corrcoef(ma.masked_invalid(TDPData[:,i]), ma.masked_invalid(TDPData[:,j]))[0, 1]
-                    if covMatTDP[i, j] < cov_thresh:
-                        covMatTDP[i, j] = np.nan
-
-                if nHC > 3 and nTAU > 3: 
-                    cmpCovTAU_gt_HC[i, j] = test_corr_sig(covMatHC[i, j], covMatTAU[i, j], nHC, nTAU)[0] < pthresh # get only probs
-                    cmpCovTAU_lt_HC[i, j] = test_corr_sig(covMatTAU[i, j], covMatHC[i, j], nTAU, nHC)[0] < pthresh # get only probs
-
-                   
-
-                if nHC > 3 and nTDP > 3: 
-                    cmpCovTDP_gt_HC[i, j] = test_corr_sig(covMatHC[i, j], covMatTDP[i, j], nHC, nTDP)[0] < pthresh # get only probs
-                    cmpCovTDP_lt_HC[i, j] = test_corr_sig(covMatTDP[i, j], covMatHC[i, j], nTDP, nHC)[0] < pthresh # get only probs
-
-           
-
-                if nTAU > 3 and nTDP > 3:
-                    cmpCovTAU_gt_TDP[i, j] = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)[0] < pthresh # get only probs
-                    cmpCovTDP_gt_TAU[i, j] = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)[0] < pthresh # get only probs
-
-
-    return [covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU]
-
-
-def generateZScore(HCData, TAUData, TDPData, hc_Mean, hc_SD):
     # HC_z: Z score of Thickness values for Control Dataset
     HC_z = np.empty(HCData.shape)
     for i in range(HCData.shape[0]):
@@ -502,10 +318,24 @@ def generateZScore(HCData, TAUData, TDPData, hc_Mean, hc_SD):
 
     return HC_z, TAU_z, TDP_z
 
-
-
 def generateWScore(AgeSexHC, AgeSexTAU, AgeSexTDP, N, HCData, TAUData, TDPData):
-    
+    """Generate W Scores for HC/TAU/TDP Data
+
+    Args:
+        AgeSexHC (ndarray): Age and Sex data of HC 
+        AgeSexTAU (ndarray): Age and Sex data of TAU 
+        AgeSexTDP (ndarray): Age and Sex data of TDP 
+        N (int):  Number of Regions we are analyzing in specified thickness Network / N = len(regNames)
+        HCData (ndarray): HC data
+        TAUData (ndarray): TAU data
+        TDPData (ndarray): TDP data
+
+    Returns:
+        HC_w (float): HC W Score
+        TAU_w (float): TAU W Score
+        TDP_w (float): TDP W Score
+    """
+
     HC_model_list = [] # (400,) 
     HC_residuals_std_list = [] # (400,)  
 
@@ -569,139 +399,253 @@ def generateWScore(AgeSexHC, AgeSexTAU, AgeSexTDP, N, HCData, TAUData, TDPData):
 
     return HC_w, TAU_w, TDP_w
 
-#### NOT USED ####
-def generateZScore_AtPath(HCData, TAUData, TDPData, hc_Mean, hc_SD, TAU_missing_index_GM, TDP_missing_index_GM):
-    # HC_z: Z score of Thickness values for Control Dataset
-    HC_z = np.empty(HCData.shape)
-    for i in range(HCData.shape[0]):
-        HC_z[i, :] = (HCData[i, :] - hc_Mean) / hc_SD
+def sexLUT(sexstr):
+    """convert string (gender type) to int
 
-    # TAU_z: Z score of Thickness values for Patient Dataset with TAU 
-    TAU_z = np.empty(TAUData.shape)
-    for i in range(TAUData.shape[0]):
-        TAU_z[i, :] = (TAUData[i, :] - np.delete(hc_Mean, TAU_missing_index_GM, axis = 0)) / np.delete(hc_SD, TAU_missing_index_GM, axis = 0)
+    Args:
+        sexstr (str): Male or Female
 
-    # TDP_z: Z score of Thickness values for Patient Dataset with TDP
-    TDP_z = np.empty(TDPData.shape)
-    for i in range(TDPData.shape[0]):
-        TDP_z[i, :] = (TDPData[i, :] - np.delete(hc_Mean, TDP_missing_index_GM, axis = 0)) / np.delete(hc_SD, TDP_missing_index_GM, axis = 0)
+    Raises:
+        Exception: Other than Male or Female
 
-    return HC_z, TAU_z, TDP_z
+    Returns:
+        0 or 1 (int): 0 - Male / 1 - Female
+    """
+    if sexstr == 'Male':
+        return 0
+    elif sexstr == 'Female':
+        return 1
+    else:
+        raise Exception("Problem with converting sex to integer")
 
-def generateWScore_AtPath(AgeSexHC, AgeSexTAU, AgeSexTDP, N, HCData, TAUData, TDPData, TAU_missing_index_GM, TDP_missing_index_GM):
+def sexToBinary(listOfValues):
+    return [sexLUT(i) for i in listOfValues]
+
+def thicknessCovMatGenerate_SigEdgesTSave(N, HCData, TAUData, TDPData, pthresh, cov_thresh, outputDir, networkNames, regNames, pathNames, ii):
+    """Calculate cov Mat for thickness data analysis (total of 15 cov Mat) - with additional saving SigEdgesT.csv
+
+    Args:
+        N (int):  Number of Regions we are analyzing in specified thickness Network / N = len(regNames)
+        HCData (ndarray): HC data
+        TAUData (ndarray): TAU data
+        TDPData (ndarray): TDP data
+        pthresh (float): p-value threshold we are currently using
+        cov_thresh (float): covariance threshold we are currently using (to remove potential noise)
+        outputDir (str): Path location to save the analysis results
+        networkNames (str list): list of thickness Network we want to analyze
+        regNames (str list): Thickness Region Names that are in the specific network we choose (in order of the 400 regions)
+        pathNames (str list): Pathology Region Names that matches to regNames (in order of the 400 regions)
+        ii (int): index to choose from networkNames
+    Returns:
+        (list of ndarray): return list of 15 cov Mat calculated
+    """
+    # 1000 rows for now
+    NN = 1000
+
+    # Create a Pandas Dataframe of 1000 rows x 13 columns (Initally all empty - NaN)
+    NetworkNames = [np.nan for _ in range(NN)]
+    ROIName1 = [np.nan for _ in range(NN)]
+    ROIName1_Path = [np.nan for _ in range(NN)]
+    ROIName2 = [np.nan for _ in range(NN)]
+    ROIName2_Path = [np.nan for _ in range(NN)]
+    r_YesAD = [np.nan for _ in range(NN)]
+    r_NoAD = [np.nan for _ in range(NN)]
+    N_YesAD = [np.nan for _ in range(NN)]
+    N_NoAD = [np.nan for _ in range(NN)]
+    z_YesAD_gt_NoAD = [np.nan for _ in range(NN)]
+    z_NoAD_gt_YesAD = [np.nan for _ in range(NN)]
+    p_YesAD_gt_NoAD = [np.nan for _ in range(NN)]
+    p_NoAD_gt_YesAD = [np.nan for _ in range(NN)]
+
+    SigEdgesT = pd.DataFrame({'NetworkNames': NetworkNames, 'ROIName1': ROIName1, 'ROIName1_Path': ROIName1_Path, 'ROIName2': ROIName2, 'ROIName2_Path': ROIName2_Path, 'r_YesAD': r_YesAD, 'r_NoAD': r_NoAD, 'N_YesAD': N_YesAD, 'N_NoAD': N_NoAD, 'z_YesAD_gt_NoAD': z_YesAD_gt_NoAD, 'z_NoAD_gt_YesAD': z_NoAD_gt_YesAD, 'p_YesAD_gt_NoAD': p_YesAD_gt_NoAD, 'p_NoAD_gt_YesAD': p_NoAD_gt_YesAD})
+    SigEdgesCounter = 0
+
+    # N --> Number of Regions to generate cov Mat
+    covMatHC = np.full((N,N), np.nan)
+    covMatTAU = np.full((N,N), np.nan)
+    covMatTDP = np.full((N,N), np.nan)
+
+    cmpCovTAU_gt_HC = np.full((N,N), np.nan)
+    cmpCovTDP_gt_HC = np.full((N,N), np.nan)
+
+    cmpCovTAU_lt_HC = np.full((N,N), np.nan)
+    cmpCovTDP_lt_HC = np.full((N,N), np.nan)
+
+    cmpCovTAU_gt_TDP = np.full((N,N), np.nan)
+    cmpCovTDP_gt_TAU = np.full((N,N), np.nan)
+
+    cmpCovTAU_gt_HC_raw = np.full((N,N), np.nan)
+    cmpCovTDP_gt_HC_raw = np.full((N,N), np.nan)
+
+    cmpCovTAU_lt_HC_raw = np.full((N,N), np.nan)
+    cmpCovTDP_lt_HC_raw = np.full((N,N), np.nan)
+
+    cmpCovTAU_gt_TDP_raw = np.full((N,N), np.nan)
+    cmpCovTDP_gt_TAU_raw = np.full((N,N), np.nan)
+
+    for i in range(N):
+        for j in range(N):
+
+            if i != j: # When it's not the same region in the current Network
+                nHC = np.sum(~np.isnan(HCData[:, i]) & ~np.isnan(HCData[:, j])) # Get the sum of regions that are not NaN
+                nTAU = np.sum(~np.isnan(TAUData[:, i]) & ~np.isnan(TAUData[:, j])) # Get the sum of regions that are not NaN
+                nTDP = np.sum(~np.isnan(TDPData[:, i]) & ~np.isnan(TDPData[:, j])) # Get the sum of regions that are not NaN
+
+                if nHC > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
+                    covMatHC[i, j] = ma.corrcoef(ma.masked_invalid(HCData[:,i]), ma.masked_invalid(HCData[:,j]))[0, 1]
+                    if covMatHC[i, j] < cov_thresh:
+                        covMatHC[i, j] = np.nan
+                        nHC = 0 # reset for below case
+
+                if nTAU > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
+                    covMatTAU[i, j] = ma.corrcoef(ma.masked_invalid(TAUData[:,i]), ma.masked_invalid(TAUData[:,j]))[0, 1]
+                    if covMatTAU[i, j] < cov_thresh:
+                        covMatTAU[i, j] = np.nan
+                        nTAU = 0
+
+                if nTDP > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
+                    covMatTDP[i, j] = ma.corrcoef(ma.masked_invalid(TDPData[:,i]), ma.masked_invalid(TDPData[:,j]))[0, 1]
+                    if covMatTDP[i, j] < cov_thresh:
+                        covMatTDP[i, j] = np.nan
+                        nTDP = 0
+
+                if nHC > 3 and nTAU > 3: 
+                    cmpCovTAU_gt_HC[i, j] = test_corr_sig(covMatHC[i, j], covMatTAU[i, j], nHC, nTAU)[0] < pthresh # get only probs
+                    cmpCovTAU_lt_HC[i, j] = test_corr_sig(covMatTAU[i, j], covMatHC[i, j], nTAU, nHC)[0] < pthresh # get only probs
+
+                    cmpCovTAU_gt_HC_raw[i, j] = test_corr_sig(covMatHC[i, j], covMatTAU[i, j], nHC, nTAU)[0] # get raw sig value
+                    cmpCovTAU_lt_HC_raw[i, j] = test_corr_sig(covMatTAU[i, j], covMatHC[i, j], nTAU, nHC)[0] # get raw sig value
+
+                if nHC > 3 and nTDP > 3: 
+                    cmpCovTDP_gt_HC[i, j] = test_corr_sig(covMatHC[i, j], covMatTDP[i, j], nHC, nTDP)[0] < pthresh # get only probs
+                    cmpCovTDP_lt_HC[i, j] = test_corr_sig(covMatTDP[i, j], covMatHC[i, j], nTDP, nHC)[0] < pthresh # get only probs
+
+                    cmpCovTDP_gt_HC_raw[i, j] = test_corr_sig(covMatHC[i, j], covMatTDP[i, j], nHC, nTDP)[0] 
+                    cmpCovTDP_lt_HC_raw[i, j] = test_corr_sig(covMatTDP[i, j], covMatHC[i, j], nTDP, nHC)[0] 
+
+                if nTAU > 3 and nTDP > 3:
+                    cmpCovTAU_gt_TDP[i, j] = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)[0] < pthresh # get only probs
+                    cmpCovTDP_gt_TAU[i, j] = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)[0] < pthresh # get only probs
+
+                    cmpCovTAU_gt_TDP_raw[i, j] = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)[0] 
+                    cmpCovTDP_gt_TAU_raw[i, j] = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)[0] 
+                
+
+                # Fill in the SigEdgesT pandas dataframe we created earlier
+                # When there is a significance diff between TAU AND TDP
+                if (cmpCovTAU_gt_TDP[i, j] == 1 or cmpCovTDP_gt_TAU[i, j] == 1) and i < j: # record significant edges
+                    SigEdgesCounter += 1 # increase SigEdgesCounter
+                    ss = SigEdgesCounter - 1 # index difference between matlab and python
+
+                    SigEdgesT.at[ss, 'NetworkNames'] = networkNames[ii - 1] # index difference between matlab and python
+                    SigEdgesT.at[ss, 'ROIName1'] = regNames[i]
+                    SigEdgesT.at[ss, 'ROIName1_Path'] = pathNames[i] # NaN is obmitted         
+                    SigEdgesT.at[ss, 'ROIName2'] = regNames[j]
+                    SigEdgesT.at[ss, 'ROIName2_Path'] = pathNames[j] # NaN is obmitted 
+                    SigEdgesT.at[ss, 'r_YesAD'] = ma.corrcoef(ma.masked_invalid(TAUData[:,i]), ma.masked_invalid(TAUData[:,j]))[0, 1]
+                    SigEdgesT.at[ss, 'r_NoAD'] = ma.corrcoef(ma.masked_invalid(TDPData[:,i]), ma.masked_invalid(TDPData[:,j]))[0, 1]
+                    SigEdgesT.at[ss, 'N_YesAD'] = nTAU
+                    SigEdgesT.at[ss, 'N_NoAD'] = nTDP
+
+                    p, z = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)
+                    SigEdgesT.at[ss, 'p_YesAD_gt_NoAD'] = p
+                    SigEdgesT.at[ss, 'z_YesAD_gt_NoAD'] = z
+
+                    p, z = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)
+                    SigEdgesT.at[ss, 'p_NoAD_gt_YesAD'] = p
+                    SigEdgesT.at[ss, 'z_NoAD_gt_YesAD'] = z
     
-    HC_model_list = [] # (40,)
-    HC_residuals_std_list = [] # (40,)
 
-    # Linear regression on HC for ALL 40 Regions
-    for k in range(N): 
-        yHC = HCData[:,k] # Thickness values of specified region for HC (54,)
-        assert(yHC.shape == (HCData.shape[0],))
-    
-        # Linear Regression
-        regHC = LinearRegression().fit(AgeSexHC, yHC)
+    # Save SigEdgesT as csv
+    SigEdgesT.to_csv(outputDir + "/SigEdges_FTD.csv")  
 
-        # Predict 
-        HC_Predict = regHC.predict(AgeSexHC) # Shape (54, ) --> Thickness values for 54 subject in specified Region
-        assert(HC_Predict.shape == (HCData.shape[0],))
+    return [covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU, cmpCovTAU_gt_HC_raw, cmpCovTDP_gt_HC_raw, cmpCovTAU_lt_HC_raw, cmpCovTDP_lt_HC_raw, cmpCovTAU_gt_TDP_raw, cmpCovTDP_gt_TAU_raw]
 
-        # Residual
-        HC_Residual = yHC - HC_Predict # Shape (54,)
-        assert(HC_Residual.shape == (HCData.shape[0],))
+def thicknessCovMatGenerate(N, HCData, TAUData, TDPData, pthresh, cov_thresh):
+    """Calculate cov Mat for thickness data analysis (total of 15 cov Mat)
 
-        HC_std = np.nanstd(HC_Residual, axis=0, ddof=0)
+    Args:
+        N (int):  Number of Regions we are analyzing in specified thickness Network / N = len(regNames)
+        HCData (ndarray): HC data
+        TAUData (ndarray): TAU data
+        TDPData (ndarray): TDP data
+        pthresh (float): p-value threshold we are currently using
+        cov_thresh (float): covariance threshold we are currently using (to remove potential noise)
 
-        # Save the Linear Regression Model
-        HC_model_list.append(regHC)
+    Returns:
+        (list of ndarray): return list of 15 cov Mat calculated
+    """
+    # N --> Number of Regions to generate cov Mat
+    covMatHC = np.full((N,N), np.nan)
+    covMatTAU = np.full((N,N), np.nan)
+    covMatTDP = np.full((N,N), np.nan)
 
-        # Save residual std
-        HC_residuals_std_list.append(HC_std)
+    cmpCovTAU_gt_HC = np.full((N,N), np.nan)
+    cmpCovTDP_gt_HC = np.full((N,N), np.nan)
 
-    
-    # Convert HC_model_list to numpy array
-    HC_model_list = np.array(HC_model_list)
-    # Modify HC_model_list to match the Pathology Regions (Removed NaN regions)
-    HC_model_list_TAU = np.delete(HC_model_list, TAU_missing_index_GM, axis = 0)
-    HC_model_list_TDP = np.delete(HC_model_list, TDP_missing_index_GM, axis = 0)
+    cmpCovTAU_lt_HC = np.full((N,N), np.nan)
+    cmpCovTDP_lt_HC = np.full((N,N), np.nan)
 
-    # Convert HC_residuals_std_list to numpy array
-    HC_residuals_std_list = np.array(HC_residuals_std_list)
-    # Modify HC_model_list to match the Pathology Regions (Removed NaN regions)
-    HC_residuals_std_list_TAU = np.delete(HC_residuals_std_list, TAU_missing_index_GM, axis = 0)
-    HC_residuals_std_list_TDP = np.delete(HC_residuals_std_list, TDP_missing_index_GM, axis = 0)
+    cmpCovTAU_gt_TDP = np.full((N,N), np.nan)
+    cmpCovTDP_gt_TAU = np.full((N,N), np.nan)
 
-    # Sanity Check
-    assert(HC_model_list.shape == (HCData.shape[1],)) # list length of 40
-    assert(HC_model_list_TAU.shape == (TAUData.shape[1],)) # list length of 35
-    assert(HC_model_list_TDP.shape == (TDPData.shape[1],)) # list length of 34
-    
-    assert(HC_residuals_std_list.shape == (HCData.shape[1],)) # list length of 40
-    assert(HC_residuals_std_list_TAU.shape == (TAUData.shape[1],)) # list length of 35
-    assert(HC_residuals_std_list_TDP.shape == (TDPData.shape[1],)) # list length of 34
+    cmpCovTAU_gt_HC_raw = np.full((N,N), np.nan)
+    cmpCovTDP_gt_HC_raw = np.full((N,N), np.nan)
 
-    # Predict values of HC, TAU and TDP using these coef / (54, 40), (26, 35), (30, 34)
-    HC_Predicted = np.empty(HCData.shape) # (54, 40)
-    for h in range(HCData.shape[0]): # 54
-        for g in range (HCData.shape[1]): # 40
-            HC_Predicted[h, g] = HC_model_list[g].predict([AgeSexHC[h]])
+    cmpCovTAU_lt_HC_raw = np.full((N,N), np.nan)
+    cmpCovTDP_lt_HC_raw = np.full((N,N), np.nan)
 
-    TAU_Predicted = np.empty(TAUData.shape) # (26, 35)
-    for h in range(TAUData.shape[0]): # 26
-        for g in range (TAUData.shape[1]): # 35
-            TAU_Predicted[h, g] = HC_model_list_TAU[g].predict([AgeSexTAU[h]])
+    cmpCovTAU_gt_TDP_raw = np.full((N,N), np.nan)
+    cmpCovTDP_gt_TAU_raw = np.full((N,N), np.nan)
 
-    TDP_Predicted = np.empty(TDPData.shape) # (30, 400) or (30, 34)
-    for h in range(TDPData.shape[0]): # 30
-        for g in range (TDPData.shape[1]): # 34
-            TDP_Predicted[h, g] = HC_model_list_TDP[g].predict([AgeSexTDP[h]])
+    for i in range(N):
+        for j in range(N):
 
-    # Compute W Score
-    HC_w = np.empty(HCData.shape) # 54 x 40
-    TAU_w = np.empty(TAUData.shape) # 26 x 35
-    TDP_w = np.empty(TDPData.shape) # 30 x 34
+            if i != j: # When it's not the same region in the current Network
+                nHC = np.sum(~np.isnan(HCData[:, i]) & ~np.isnan(HCData[:, j])) # Get the sum of regions that are not NaN
+                nTAU = np.sum(~np.isnan(TAUData[:, i]) & ~np.isnan(TAUData[:, j])) # Get the sum of regions that are not NaN
+                nTDP = np.sum(~np.isnan(TDPData[:, i]) & ~np.isnan(TDPData[:, j])) # Get the sum of regions that are not NaN
 
-    for i in range(HCData.shape[0]): # 54
-        HC_w[i, :] = (HCData[i, :] - HC_Predicted[i, :]) / HC_residuals_std_list
+                if nHC > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
+                    covMatHC[i, j] = ma.corrcoef(ma.masked_invalid(HCData[:,i]), ma.masked_invalid(HCData[:,j]))[0, 1]
+                    if covMatHC[i, j] < cov_thresh:
+                        covMatHC[i, j] = np.nan
+                        nHC = 0 # reset for below case
 
-    for i in range(TAUData.shape[0]): # 26
-        TAU_w[i, :] = (TAUData[i, :] - TAU_Predicted[i, :]) / HC_residuals_std_list_TAU
+                if nTAU > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
+                    covMatTAU[i, j] = ma.corrcoef(ma.masked_invalid(TAUData[:,i]), ma.masked_invalid(TAUData[:,j]))[0, 1]
+                    if covMatTAU[i, j] < cov_thresh:
+                        covMatTAU[i, j] = np.nan
+                        nTAU = 0 
 
-    for i in range(TDPData.shape[0]): # 30
-        TDP_w[i, :] = (TDPData[i, :] - TDP_Predicted[i, :]) / HC_residuals_std_list_TDP
+                if nTDP > 3: # For only where regions that doesn't have invalid values / Nan for where covariance is less than 0.1
+                    covMatTDP[i, j] = ma.corrcoef(ma.masked_invalid(TDPData[:,i]), ma.masked_invalid(TDPData[:,j]))[0, 1]
+                    if covMatTDP[i, j] < cov_thresh:
+                        covMatTDP[i, j] = np.nan
+                        nTDP = 0
 
-    return HC_w, TAU_w, TDP_w
-#### NOT USED ####
+                if nHC > 3 and nTAU > 3: 
+                    cmpCovTAU_gt_HC[i, j] = test_corr_sig(covMatHC[i, j], covMatTAU[i, j], nHC, nTAU)[0] < pthresh # get only probs
+                    cmpCovTAU_lt_HC[i, j] = test_corr_sig(covMatTAU[i, j], covMatHC[i, j], nTAU, nHC)[0] < pthresh # get only probs
 
-def drawthicknessboxplot(HCData, TAUData, TDPData, x_label, y_label, title, outputDir, outputName):
-    # HCData, TAUData, TDPData --> Shape N x 400
-    # Get Mean for each Regions
-    HC_Mean = np.mean(HCData, axis=0)
-    TAU_Mean = np.mean(TAUData, axis=0)
-    TDP_Mean = np.mean(TDPData, axis=0)
+                    cmpCovTAU_gt_HC_raw[i, j] = test_corr_sig(covMatHC[i, j], covMatTAU[i, j], nHC, nTAU)[0] # get raw sig value
+                    cmpCovTAU_lt_HC_raw[i, j] = test_corr_sig(covMatTAU[i, j], covMatHC[i, j], nTAU, nHC)[0] # get raw sig value
 
-    # Define data
-    data = [HC_Mean, TAU_Mean, TDP_Mean]
+                if nHC > 3 and nTDP > 3: 
+                    cmpCovTDP_gt_HC[i, j] = test_corr_sig(covMatHC[i, j], covMatTDP[i, j], nHC, nTDP)[0] < pthresh # get only probs
+                    cmpCovTDP_lt_HC[i, j] = test_corr_sig(covMatTDP[i, j], covMatHC[i, j], nTDP, nHC)[0] < pthresh # get only probs
 
-    # Define figure
-    fig, ax = plt.subplots()
+                    cmpCovTDP_gt_HC_raw[i, j] = test_corr_sig(covMatHC[i, j], covMatTDP[i, j], nHC, nTDP)[0] 
+                    cmpCovTDP_lt_HC_raw[i, j] = test_corr_sig(covMatTDP[i, j], covMatHC[i, j], nTDP, nHC)[0] 
 
-    # Draw the boxplots with x_label and y_label
-    bplot = ax.boxplot(data, notch=True, labels=x_label)
-    ax.set_ylabel(y_label)
+                if nTAU > 3 and nTDP > 3:
+                    cmpCovTAU_gt_TDP[i, j] = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)[0] < pthresh # get only probs
+                    cmpCovTDP_gt_TAU[i, j] = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)[0] < pthresh # get only probs
 
-    # perform t-test
-    t_stat1, pval1 = stats.ttest_ind(HC_Mean, TAU_Mean)
-    t_stat2, pval2 = stats.ttest_ind(HC_Mean, TDP_Mean)
-    t_stat3, pval3 = stats.ttest_ind(TAU_Mean, TDP_Mean)
+                    cmpCovTAU_gt_TDP_raw[i, j] = test_corr_sig(covMatTDP[i, j], covMatTAU[i, j], nTDP, nTAU)[0] 
+                    cmpCovTDP_gt_TAU_raw[i, j] = test_corr_sig(covMatTAU[i, j], covMatTDP[i, j], nTAU, nTDP)[0] 
 
-    # set title
-    ax.set_title(title + f", p(HC vs TAU)={pval1}, p(HC vs TDP)={pval2}, p(TAU vs TDP)={pval3}", fontsize = 5)
-
-    # save figure
-    fig.savefig(os.path.join(outputDir, outputName), dpi=400, format='tif')
-
-
-
+    return [covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU, cmpCovTAU_gt_HC_raw, cmpCovTDP_gt_HC_raw, cmpCovTAU_lt_HC_raw, cmpCovTDP_lt_HC_raw, cmpCovTAU_gt_TDP_raw, cmpCovTDP_gt_TAU_raw]
 
 def fixedDensity(covMat, N):
 
@@ -718,3 +662,236 @@ def fixedDensity(covMat, N):
     fixedDcovMat = np.where(covMat < threshVal, covMat, np.nan) # True / False
 
     return fixedDcovMat
+
+def thickness3DMapping(covMatlist, NetworkDataGeneral, currCoM, LabelNames, cRange, MarkerVecHC, MarkerVecTAU, MarkerVecTDP, colorVec, outputDir, pthresh, fd_val, FD = True, W_Score = False):
+    """3D mapping of the Pathology Data Analysis
+
+    Args:
+        covMatlist (list of ndarray): list of 15 cov mat we calculated for thickness dataset
+        NetworkDataGeneral (obj): Preconstructed atlas data
+        currCoM ndarray): Center of Mass of Thickness Regions
+        LabelNames (str list): list of thickness regions we map to 3D Atlas
+        cRange (int list): list containing the max min value of Network edge
+        MarkerVecHC (ndarray): vector denoting the node size of our 3D Mapped Network (for HC)
+        MarkerVecTAU (ndarray): vector denoting the node size of our 3D Mapped Network (for TAU)
+        MarkerVecTDP (ndarray): vector denoting the node size of our 3D Mapped Network (for TDP)
+        colorVec (ndarray): vector denoting the node color of our 3D Mapped Network (for HC, TAU, TDP)
+        outputDir (str): Path location to save the analysis results
+        pthresh (float): p-value threshold we are currently using
+        fd_val (int): Fixed Density value. 100 --> we only look at top 100 most significant edges (lowest p-values)
+        FD (bool, optional): boolean denoting if we want to do FD analysis. Defaults to True.
+        W_Score (bool, optional): boolean denoting if this is W-Score 3D Mapping or not. Defaults to False.
+    """
+    # Images to Crop
+    HC_img = None
+    TAU_img = None
+    TDP_img = None
+    TAU_gt_HC_img = None
+    TDP_gt_HC_img = None
+    TAU_lt_HC_img = None
+    TDP_lt_HC_img = None
+    TAU_gt_TDP_img = None
+    TDP_gt_TAU_img = None
+    # Fixed Density Part
+    TAU_gt_HC_FD_img = None
+    TDP_gt_HC_FD_img = None
+    TAU_lt_HC_FD_img = None
+    TDP_lt_HC_FD_img = None
+    TAU_gt_TDP_FD_img = None
+    TDP_gt_TAU_FD_img = None
+    
+    imglist = [HC_img, TAU_img, TDP_img, TAU_gt_HC_img, TDP_gt_HC_img, TAU_lt_HC_img, TDP_lt_HC_img, TAU_gt_TDP_img, TDP_gt_TAU_img, TAU_gt_HC_FD_img, TDP_gt_HC_FD_img, TAU_lt_HC_FD_img, TDP_lt_HC_FD_img, TAU_gt_TDP_FD_img, TDP_gt_TAU_FD_img]
+
+    # MODIFY the last 6 covMat in covMatlist for FixedDensity
+    for i in range(9, 15):
+        covMatlist[i] = fixedDensity(covMatlist[i], fd_val)
+    
+    if W_Score: # W_Score
+        covMatNamelist = ['covMatHC_W', 'covMatTAU_W', 'covMatTDP_W', 'cmpCovTAU_gt_HC_W', 'cmpCovTDP_gt_HC_W', 'cmpCovTAU_lt_HC_W', 'cmpCovTDP_lt_HC_W', 'cmpCovTAU_gt_TDP_W', 'cmpCovTDP_gt_TAU_W', f'cmpCovTAU_gt_HC_FD_W_{fd_val}', f'cmpCovTDP_gt_HC_FD_W_{fd_val}', f'cmpCovTAU_lt_HC_FD_W_{fd_val}', f'cmpCovTDP_lt_HC_FD_W_{fd_val}', f'cmpCovTAU_gt_TDP_FD_W_{fd_val}', f'cmpCovTDP_gt_TAU_FD_W_{fd_val}']
+    else : # Original
+        covMatNamelist = ['covMatHC', 'covMatTAU', 'covMatTDP', 'cmpCovTAU_gt_HC', 'cmpCovTDP_gt_HC', 'cmpCovTAU_lt_HC', 'cmpCovTDP_lt_HC', 'cmpCovTAU_gt_TDP', 'cmpCovTDP_gt_TAU', f'cmpCovTAU_gt_HC_FD_{fd_val}', f'cmpCovTDP_gt_HC_FD_{fd_val}', f'cmpCovTAU_lt_HC_FD_{fd_val}', f'cmpCovTDP_lt_HC_FD_{fd_val}', f'cmpCovTAU_gt_TDP_FD_{fd_val}', f'cmpCovTDP_gt_TAU_FD_{fd_val}']
+    
+        
+    MarkerVecList = [MarkerVecHC, MarkerVecTAU, MarkerVecTDP, MarkerVecTAU, MarkerVecTDP, MarkerVecTAU, MarkerVecTDP, MarkerVecTAU, MarkerVecTDP, MarkerVecTAU, MarkerVecTDP, MarkerVecTAU, MarkerVecTDP, MarkerVecTAU, MarkerVecTDP]
+    
+    for j in range(len(covMatlist)):
+        # Define figure
+        fig_atlas = plt.figure()
+
+        # Define MarkerVec to Use / Same np.ones(np.sum(currNetwork))
+        MarkerVec = MarkerVecList[j]
+
+        # Edge color colormap
+        if j == 0 or j == 1 or j == 2:
+            covType = 'original'
+        else:
+            covType = 'sig'
+
+        # 3D Mapping
+        plotNetwork3Individual(fig_atlas, covMatlist[j], NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MarkerVec, colorVec, 3, showLabels = 0, covType = covType)
+
+        fig_atlas.tight_layout()
+
+        if W_Score: # W_score
+            # Save Graph Object
+            save3DGraph(covMatlist[j], outputDir, covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}_WScore')
+            # Save the figure
+            plt.savefig(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + '_WSCORE' + f'_pthresh_{str(pthresh).split(".")[1]}', dpi=1000, bbox_inches='tight')
+            # Read figure to crop
+            imglist[j] = Image.open(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + '_WSCORE' + f'_pthresh_{str(pthresh).split(".")[1]}' + '.png')
+        else: # Original
+            # Save Graph Object
+            save3DGraph(covMatlist[j], outputDir, covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}')
+            # Save the figure
+            plt.savefig(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}', dpi=1000, bbox_inches='tight')
+            # Read figure to crop
+            imglist[j] = Image.open(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}' + '.png')
+
+
+    thickness_comb_img = cropImg6(imglist[3:9])
+    thickness_comb_FD_img = cropImg6(imglist[9:])
+
+    if W_Score: # W_Score
+        thickness_comb_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}(WSCORE_Original).png')
+        thickness_comb_FD_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}(WSCORE_FixedDensity).png')
+    else: # Original
+        thickness_comb_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}(Original).png')
+        thickness_comb_FD_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}(FixedDensity).png')
+####################################################################################################################################################
+
+
+
+
+############################################################### THICKNESS AT PATH PART ##############################################################
+def thicknessAtPathFewObs(covMatlist, TAU_missing_index, TDP_missing_index):
+    # Modify the covMatlist data so exclude these regions
+    
+    # Rows
+    # covMatlist[0] = np.delete(covMatlist[0], TAU_missing_index, axis = 0) # covMatHC
+    covMatlist[1] = np.delete(covMatlist[1], TAU_missing_index, axis = 0) # covMatTAU
+    covMatlist[2] = np.delete(covMatlist[2], TDP_missing_index, axis = 0) # covMatTDP
+    covMatlist[3] = np.delete(covMatlist[3], TAU_missing_index, axis = 0) # cmpCovTAU_gt_HC
+    covMatlist[4] = np.delete(covMatlist[4], TDP_missing_index, axis = 0) # cmpCovTDP_gt_HC
+    covMatlist[5] = np.delete(covMatlist[5], TAU_missing_index, axis = 0) # cmpCovTAU_lt_HC
+    covMatlist[6] = np.delete(covMatlist[6], TDP_missing_index, axis = 0) # cmpCovTDP_lt_HC
+    covMatlist[7] = np.delete(covMatlist[7], TAU_missing_index, axis = 0) # cmpCovTAU_gt_TDP
+    covMatlist[8] = np.delete(covMatlist[8], TDP_missing_index, axis = 0) # cmpCovTDP_gt_TAU
+    covMatlist[9] = np.delete(covMatlist[9], TAU_missing_index, axis = 0) # cmpCovTAU_gt_HC_raw
+    covMatlist[10] = np.delete(covMatlist[10], TDP_missing_index, axis = 0) # cmpCovTDP_gt_HC_raw
+    covMatlist[11] = np.delete(covMatlist[11], TAU_missing_index, axis = 0) # cmpCovTAU_lt_HC_raw
+    covMatlist[12] = np.delete(covMatlist[12], TDP_missing_index, axis = 0) # cmpCovTDP_lt_HC_raw
+    covMatlist[13] = np.delete(covMatlist[13], TAU_missing_index, axis = 0) # cmpCovTAU_gt_TDP_raw
+    covMatlist[14] = np.delete(covMatlist[14], TDP_missing_index, axis = 0) # cmpCovTDP_gt_TAU_raw
+
+    # Columns
+    # covMatlist[0] = np.delete(covMatlist[0], TAU_missing_index, axis = 0) # covMatHC
+    covMatlist[1] = np.delete(covMatlist[1], TAU_missing_index, axis = 1) # covMatTAU
+    covMatlist[2] = np.delete(covMatlist[2], TDP_missing_index, axis = 1) # covMatTDP
+    covMatlist[3] = np.delete(covMatlist[3], TAU_missing_index, axis = 1) # cmpCovTAU_gt_HC
+    covMatlist[4] = np.delete(covMatlist[4], TDP_missing_index, axis = 1) # cmpCovTDP_gt_HC
+    covMatlist[5] = np.delete(covMatlist[5], TAU_missing_index, axis = 1) # cmpCovTAU_lt_HC
+    covMatlist[6] = np.delete(covMatlist[6], TDP_missing_index, axis = 1) # cmpCovTDP_lt_HC
+    covMatlist[7] = np.delete(covMatlist[7], TAU_missing_index, axis = 1) # cmpCovTAU_gt_TDP
+    covMatlist[8] = np.delete(covMatlist[8], TDP_missing_index, axis = 1) # cmpCovTDP_gt_TAU
+    covMatlist[9] = np.delete(covMatlist[9], TAU_missing_index, axis = 1) # cmpCovTAU_gt_HC_raw
+    covMatlist[10] = np.delete(covMatlist[10], TDP_missing_index, axis = 1) # cmpCovTDP_gt_HC_raw
+    covMatlist[11] = np.delete(covMatlist[11], TAU_missing_index, axis = 1) # cmpCovTAU_lt_HC_raw
+    covMatlist[12] = np.delete(covMatlist[12], TDP_missing_index, axis = 1) # cmpCovTDP_lt_HC_raw
+    covMatlist[13] = np.delete(covMatlist[13], TAU_missing_index, axis = 1) # cmpCovTAU_gt_TDP_raw
+    covMatlist[14] = np.delete(covMatlist[14], TDP_missing_index, axis = 1) # cmpCovTDP_gt_TAU_raw
+
+    return covMatlist
+
+def thicknessAtPath3DMapping(covMatlist, NetworkDataGeneral, CoM_HC, CoM_TAU, CoM_TDP, LabelNames_Path_HC, LabelNames_Path_TAU, LabelNames_Path_TDP, cRange, MarkerVecHC, MarkerVecTAU, MarkerVecTDP, colorVecHC, colorVecTAU, colorVecTDP, outputDir, pthresh, fd_val, FD = True, W_Score = False):
+    
+    # Images to Crop
+    HC_img = None
+    TAU_img = None
+    TDP_img = None
+    TAU_gt_HC_img = None
+    TDP_gt_HC_img = None
+    TAU_lt_HC_img = None
+    TDP_lt_HC_img = None
+    TAU_gt_TDP_img = None
+    TDP_gt_TAU_img = None
+    TAU_gt_HC_FD_img = None
+    TDP_gt_HC_FD_img = None
+    TAU_lt_HC_FD_img = None
+    TDP_lt_HC_FD_img = None
+    TAU_gt_TDP_FD_img = None
+    TDP_gt_TAU_FD_img = None
+
+    imglist = [HC_img, TAU_img, TDP_img, TAU_gt_HC_img, TDP_gt_HC_img, TAU_lt_HC_img, TDP_lt_HC_img, TAU_gt_TDP_img, TDP_gt_TAU_img, TAU_gt_HC_FD_img, TDP_gt_HC_FD_img, TAU_lt_HC_FD_img, TDP_lt_HC_FD_img, TAU_gt_TDP_FD_img, TDP_gt_TAU_FD_img]
+
+    # MODIFY the last 6 covMat in covMatlist for FixedDensity
+    for i in range(9, 15):
+        covMatlist[i] = fixedDensity(covMatlist[i], fd_val)
+
+    if W_Score: # W_Score
+        covMatNamelist = ['covMatHC_Path_W', 'covMatTAU_Path_W', 'covMatTDP_Path_W', 'cmpCovTAU_gt_HC_Path_W', 'cmpCovTDP_gt_HC_Path_W', 'cmpCovTAU_lt_HC_Path_W', 'cmpCovTDP_lt_HC_Path_W', 'cmpCovTAU_gt_TDP_Path_W', 'cmpCovTDP_gt_TAU_Path_W', f'cmpCovTAU_gt_HC_FD_Path_W_{fd_val}', f'cmpCovTDP_gt_HC_FD_Path_W_{fd_val}', f'cmpCovTAU_lt_HC_FD_Path_W_{fd_val}', f'cmpCovTDP_lt_HC_FD_Path_W_{fd_val}', f'cmpCovTAU_gt_TDP_FD_Path_W_{fd_val}', f'cmpCovTDP_gt_TAU_FD_Path_W_{fd_val}']
+    else: # Original
+        covMatNamelist = ['covMatHC_Path', 'covMatTAU_Path', 'covMatTDP_Path', 'cmpCovTAU_gt_HC_Path', 'cmpCovTDP_gt_HC_Path', 'cmpCovTAU_lt_HC_Path', 'cmpCovTDP_lt_HC_Path', 'cmpCovTAU_gt_TDP_Path', 'cmpCovTDP_gt_TAU_Path', f'cmpCovTAU_gt_HC_FD_{fd_val}_Path', f'cmpCovTDP_gt_HC_FD_{fd_val}_Path', f'cmpCovTAU_lt_HC_FD_{fd_val}_Path', f'cmpCovTDP_lt_HC_FD_{fd_val}_Path', f'cmpCovTAU_gt_TDP_FD_{fd_val}_Path', f'cmpCovTDP_gt_TAU_FD_{fd_val}_Path']
+
+    for j in range(len(covMatlist)):
+        # Define figure
+        fig_atlas = plt.figure()
+
+        # Edge color colormap
+        if j == 0 or j == 1 or j == 2:
+            covType = 'original'
+        else:
+            covType = 'sig'
+
+        if j == 0: # HC
+            currPathCoM = CoM_HC
+            currLabelNames_Path = LabelNames_Path_HC
+            currMarkerVec = MarkerVecHC
+            currColorVec = colorVecHC
+        elif j == 1 or j == 3 or j == 5 or j == 7: # TAU part
+            currPathCoM = CoM_TAU
+            currLabelNames_Path = LabelNames_Path_TAU
+            currMarkerVec = MarkerVecTAU
+            currColorVec = colorVecTAU
+        else: # TDP part
+            currPathCoM = CoM_TDP
+            currLabelNames_Path = LabelNames_Path_TDP
+            currMarkerVec = MarkerVecTDP
+            currColorVec = colorVecTDP
+
+        # [covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU]
+        plotNetwork3Individual(fig_atlas, covMatlist[j], NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currPathCoM, currLabelNames_Path, cRange, currMarkerVec, currColorVec, 3, showLabels = 0, covType = covType)
+
+        fig_atlas.tight_layout()
+
+        if W_Score: # W_Score
+            # Save Graph Object
+            save3DGraph(covMatlist[j], outputDir, covMatNamelist[j] + f'_Path_pthresh_{str(pthresh).split(".")[1]}_WScore')
+            # Save the figure
+            plt.savefig(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + '_WSCORE' + f'_pthresh_{str(pthresh).split(".")[1]}_(At Path)', dpi=1000, bbox_inches='tight')
+            # Read figure to crop
+            imglist[j] = Image.open(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + '_WSCORE' + f'_pthresh_{str(pthresh).split(".")[1]}_(At Path)' + '.png')
+
+        else: # Original
+            # Save Graph Object
+            save3DGraph(covMatlist[j], outputDir, covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}')
+            # Save the figure
+            plt.savefig(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}_(At Path)', dpi=1000, bbox_inches='tight')
+            # Read figure to crop
+            imglist[j] = Image.open(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}_(At Path)' + '.png')
+
+    thickness_comb_img = cropImg6(imglist[3:9])
+    thickness_comb_FD_img = cropImg6(imglist[9:])
+
+    if W_Score: # W_Score
+        thickness_comb_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}_AT_PATH(WSCORE).png')
+        thickness_comb_FD_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}_AT_PATH(WSCORE_FixedDensity).png')
+    else: # Original
+        thickness_comb_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}_AT_PATH(Original).png')
+        thickness_comb_FD_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}_AT_PATH(FixedDensity).png')
+
+####################################################################################################################################################
+
+
+def sliceCovMat(covMat, colList):
+    return covMat[np.ix_(colList, colList)]
+

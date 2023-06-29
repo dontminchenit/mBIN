@@ -13,119 +13,88 @@ from PIL import Image
 from sklearn.linear_model import LinearRegression
 
 sys.path.insert(1, "/Users/hyung/Research23_Network_Analysis/mBIN/Python/NetworkAnalysisGeneral/Code/SupportFunctions/")
-from analysisVisualization import drawScatterplot, nonZeroDegCmp, nonZeroDegCorr, drawCovMatrix, cropImg4, cropImg2, cropImg6
+from analysisVisualization import drawScatterplot, nonZeroDegCmp, nonZeroDegCorr, drawCovMatrix, cropImg4, cropImg2, cropImg6, drawthicknessboxplot
 from plotNetwork3 import plotNetwork3 
 from plotNetwork3_Individual import plotNetwork3Individual 
-from FTDHelperFunctions import thicknessCovMatGenerate, thicknessCovMatGenerate_SigEdgesTSave, sexToBinary, generateZScore, generateWScore, drawthicknessboxplot, save3DGraph, fixedDensity
+from FTDHelperFunctions import thickSelectNetwork, thicknessCovMatGenerate, thicknessCovMatGenerate_SigEdgesTSave, sexToBinary, generateZScore, generateWScore, save3DGraph, fixedDensity, thickness3DMapping
 
 def thicknessCovFTD(NetworkDataGeneral, pathLUT, HCResults, PatientTAUResults, PatientTDPResults, outputDir, plotON = True):
+    """Thickness Data Analysis
+
+    Args:
+        NetworkDataGeneral (obj): Preconstructed atlas data
+        pathLUT (DataFrame): Look up table matching Atlas region names to Atlas Labels (Index) in NetworkDataGeneral Object
+        HCResults (dict): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of Healthy Control Subjects
+        PatientTAUResults (dict): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of TAU Patients
+        PatientTDPResults (dict): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of TDP Patients
+        outputDir (str): Path location to save the analysis results
+        plotON (bool, optional): Boolean value denoting if we should do 3D Atlas Mapping. Defaults to True.
+    """
+    #-------------------------------------------------- Select Specific Network we want to do Thickness Analysis on --------------------------------------------------
     # List of network names
     networkNames=['DorsAttn','VentAttn','Limbic','SomMot','Default','Cont','_Vis_','All']
 
-    # Denothing what NetworkNames to use
-    # 5 --> 'Default'
-    #ii = 5
-    # 8 --> Include all networkNames
-    ii = 8 
-
-    # Add similar way to add on the custom boolean vector
+    # Denote what NetworkNames to use
+    # ii = 5 # 5 --> 'Default'
+    ii = 8  # 8 --> Include all networkNames
     
-    ###################################################################################################################################################
+    ########################################################### Variable Summary ######################################################################
     # Label_Name2_list: Names of 400 Regions in the Schaffer Atlas (in order with numlab = 400)
     # currNetwork: List of Boolean denoting if Label_Name2_list contains specified networkNames or not / Boolean list of length 400 / in order of Label_Name2_List
-    # pathLUTSorted: Sort the pathology LUT by Label_ID400x7 1 to 400 / LUT matching 400 thickness regions to PathName
-    # pathNames: PathNames that matches to specified networkNames as list (in order of the 400 regions)
-    # regNamesRaw: Label_Name2 that contains specified networkNames as list (in order of the 400 regions)
+    # saveName: Name of the Network we choose
+    # regNames: Thickness Region Names that are in the specific network we choose (in order of the 400 regions)
+    # pathNames: Pathology Region Names that matches to regNames (in order of the 400 regions)
+    # N: Number of Regions we are analyzing in specified thickness Network / N = len(regNames)
     ###################################################################################################################################################
-    
-    # Due to mat file issues, loading Label_Name2 from txt file / list of length 400 --> Names of 400 Regions in the Schaffer Atlas (in order)
-    # Label_Name2: Schaefer400x7 -> LUT / len() = 400
-    with open('/Users/hyung/Research23_Network_Analysis/mBIN/Python/LBD/NetworkDataGeneral_Schaefer400x7_LUT_Label_Name2.txt') as file:
-        Label_Name2_list = [line.rstrip() for line in file]
-        file.close()
-    
-    if(ii == 8):
-        currNetwork = np.ones(len(Label_Name2_list), dtype=bool)
-    else: # NetworkName --> 'Default' (because --> ii = 5)
-        # -1 added because of index difference between python and matlab
-        # currNetwork: List of Boolean denoting if Label_Name2_list contains networkNames('Default') or not / Boolean list of length 400
-        currNetwork = np.array([networkNames[ii - 1] in label_name for label_name in Label_Name2_list], dtype=bool)
-
-    # saveName --> this specific case: 'Default' / 'All'
-    saveName = networkNames[ii - 1] # -1 added because of index difference between python and matlab
-
-    # Sort the pathology LUT by Label_ID400x7
-    # pathLUT = pd.read_csv(os.path.join(dataDir,'schaefer_path_20210719_20220328.csv'))
-    pathLUTSorted = pathLUT.sort_values(by=['Label_ID400x7']) # Sort by label 1 to 400
-    
-    # Get the PathNames of the current Network ('Default') inside the pathLUTSorted dataset as list / Out of 400 Regions there are 91 regions that contains 'Default'
-    pathNames = pathLUTSorted[currNetwork]['PathName'].tolist()
-
-    # Get the Label_Name2 that contains current Network ('Default') as list
-    regNamesRaw = list(compress(Label_Name2_list, currNetwork))
-
-    # Length of regNamesRaw (=91 / 400)
-    SN = len(regNamesRaw)
-
-    # Change the regNamesRaw (_ to -)
-    regNames = []
-
-    for j in range(SN):
-        nameSplit = regNamesRaw[j].replace('_', '-')
-        regNames.append(nameSplit)
+    currNetwork, saveName, regNames, pathNames, N = thickSelectNetwork(networkNames, ii, pathLUT)
 
     # Get current Center of Mass for specified current Network / i = 5 --> 91 / i = 8 --> 400
     currCoM = (NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['CoM'][0, 0])[currNetwork]
 
-    # N = sum(currNetwork) / basically same as SN / 91
-    N = SN
 
-    # Sanity Check
-    assert(N == 400)
+    #------------------------------------------- From the Selected Thickness Network Divide into HC, TAU, and TDP thickness Data -------------------------------------------
+    # PatientTAUResults: thickness mean and volume total values for [Patient (TAU) MRI data IDs (26) x lables (numLab = 400 regions in the sch region if we selected ii = 8)]
+    # PatientTDPResults: thickness mean and volume total values for [Patient (TDP) MRI data IDs (30) x lables (numLab = 400 regions in the sch region if we selected ii = 8)]
+    # HCResults: thickness mean and volume total values for [Control MRI data IDs (54) x lables (numLab = 400 regions in the sch region if we selected ii = 8)]
 
-    #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    # PatientTAUResults: thickness mean and volume total values for [Patient (TAU) MRI data IDs (26) x lables (numLab = 400 regions in the sch region)]
-    # PatientTDPResults: thickness mean and volume total values for [Patient (TDP) MRI data IDs (30) x lables (numLab = 400 regions in the sch region)]
-    # HCResults: thickness mean and volume total values for [Control MRI data IDs (54) x lables (numLab)]
-
-    # Get thickness mean values from HC MRI Data for only current Network [Control MRI data IDs x N] --> 54 HC x 400 regions
+    # Get Thickness values from HC MRI Data for only current Network [Control MRI data IDs x N] --> 54 HC x 400 regions
     thickHC = HCResults['Thickness']['Mean'][:,currNetwork]
-    # Get thickness mean values from Patient TAU MRI Data for only current Network [Control MRI data IDs x N] --> 26 TAU x 400 regions
+    # Get Thickness values from Patient TAU MRI Data for only current Network [Control MRI data IDs x N] --> 26 TAU x 400 regions
     thickTAU = PatientTAUResults['Thickness']['Mean'][:,currNetwork]
-    # Get thickness mean values from Patient TDP MRI Data for only current Network [Control MRI data IDs x N] --> 30 TDP x 400 regions
+    # Get Thickness values from Patient TDP MRI Data for only current Network [Control MRI data IDs x N] --> 30 TDP x 400 regions
     thickTDP = PatientTDPResults['Thickness']['Mean'][:,currNetwork]
 
-    # Get NORMALIZED volume values from HC MRI Data for only current Network [Control MRI data IDs x N] --> 54 HC x 400 regions
+    # Get NORMALIZED(=Volume/ICV) volume values from HC MRI Data for only current Network [Control MRI data IDs x N] --> 54 HC x 400 regions
     volumeHC = HCResults['Volume']['Normalized'][:,currNetwork]
-    # Get volume values from Patient TAU MRI Data for only current Network [Control MRI data IDs x N] --> 26 TAU x 400 regions
+    # Get NORMALIZED(=Volume/ICV) volume values from Patient TAU MRI Data for only current Network [Control MRI data IDs x N] --> 26 TAU x 400 regions
     volumeTAU = PatientTAUResults['Volume']['Normalized'][:,currNetwork]
-    # Get volume values from Patient TDP MRI Data for only current Network [Control MRI data IDs x N] --> 30 TDP x 400 regions
+    # Get NORMALIZED(=Volume/ICV) volume values from Patient TDP MRI Data for only current Network [Control MRI data IDs x N] --> 30 TDP x 400 regions
     volumeTDP = PatientTDPResults['Volume']['Normalized'][:,currNetwork]
 
     # Sanity Check
-    assert(thickHC.shape == (54, 400))
-    assert(thickTAU.shape == (26, 400))
-    assert(thickTDP.shape == (30, 400))
-    assert(volumeHC.shape == (54, 400))
-    assert(volumeTAU.shape == (26, 400))
-    assert(volumeTDP.shape == (30, 400))
+    if ii == 8:
+        assert(thickHC.shape == (54, 400))
+        assert(thickTAU.shape == (26, 400))
+        assert(thickTDP.shape == (30, 400))
+        assert(volumeHC.shape == (54, 400))
+        assert(volumeTAU.shape == (26, 400))
+        assert(volumeTDP.shape == (30, 400))
+    else: # ii == 5
+        assert(thickHC.shape == (54, 91))
+        assert(thickTAU.shape == (26, 91))
+        assert(thickTDP.shape == (30, 91))
+        assert(volumeHC.shape == (54, 91))
+        assert(volumeTAU.shape == (26, 91))
+        assert(volumeTDP.shape == (30, 91))
 
-    ################### Z SCORE ###################
-    # Get Mean/STD of the thickness values for HC / Mean, STD of HC for each 400 regions / 1 x 400
-    hc_Mean_Thick = np.nanmean(thickHC, axis=0)
-    hc_SD_Thick = np.nanstd(thickHC, axis=0, ddof=0) # ddof parameter is set to 0, which specifies that the divisor should be N, where N is the number of non-NaN elements in the array
-
+    #------------------------------------------- Calculating Z SCORE -------------------------------------------
     # Get Z score for thickness values
-    HC_z, TAU_z, TDP_z = generateZScore(thickHC, thickTAU, thickTDP, hc_Mean_Thick, hc_SD_Thick)
-
-    # Get Mean/STD of the VOLUME values for HC / Mean, STD of HC for each 400 regions / 1 x 400
-    hc_Mean_Vol = np.nanmean(volumeHC, axis=0)
-    hc_SD_Vol = np.nanstd(volumeHC, axis=0, ddof=0) 
+    HC_z, TAU_z, TDP_z = generateZScore(thickHC, thickTAU, thickTDP)
 
     # Get Z score for VOLUME values
-    HC_z_Vol, TAU_z_Vol, TDP_z_Vol = generateZScore(volumeHC, volumeTAU, volumeTDP, hc_Mean_Vol, hc_SD_Vol)
+    HC_z_Vol, TAU_z_Vol, TDP_z_Vol = generateZScore(volumeHC, volumeTAU, volumeTDP)
 
-    ################### W SCORE ###################
+    #------------------------------------------- Calculating W SCORE -------------------------------------------
     # List of 54, 26, and 30 Denoting Age
     ageHC = HCResults['Age'] # (54,)
     ageTAU = PatientTAUResults['Age'] # (26,)
@@ -163,7 +132,7 @@ def thicknessCovFTD(NetworkDataGeneral, pathLUT, HCResults, PatientTAUResults, P
     # Get W score for VOLUME values
     HC_w_Vol, TAU_w_Vol, TDP_w_Vol = generateWScore(AgeSexHC, AgeSexTAU, AgeSexTDP, N, volumeHC, volumeTAU, volumeTDP)
     
-    # Generate Box plot of Thickness/Z-Score/W-Score Distributions (Mean across subjects)
+    #------------------------------------------- Generate Box plot of Thickness/Z-Score/W-Score Distributions (Mean across subjects) -------------------------------------------
     drawthicknessboxplot(thickHC, thickTAU, thickTDP, ['HC', 'TAU', 'TDP'], 'Mean Thickness', saveName, outputDir, f"FTD_Distribution_{saveName}_Original.tif")
     drawthicknessboxplot(HC_z, TAU_z, TDP_z, ['HC', 'TAU', 'TDP'], 'Mean Z-Score', saveName, outputDir, f"FTD_Distribution_{saveName}_ZScore.tif")
     drawthicknessboxplot(HC_w, TAU_w, TDP_w, ['HC', 'TAU', 'TDP'], 'Mean W-Score', saveName, outputDir, f"FTD_Distribution_{saveName}_WScore.tif")
@@ -176,94 +145,88 @@ def thicknessCovFTD(NetworkDataGeneral, pathLUT, HCResults, PatientTAUResults, P
         pthresh = pthresh_list[x]
         cov_thresh = 0.1 # just to make sure there is no Noise
 
-        # COMPUTING CovMat [THICKNESS]
+        #------------------------------------------- COMPUTING CovMat [THICKNESS] -------------------------------------------
         # covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU
         covMatList_Original = thicknessCovMatGenerate_SigEdgesTSave(N, thickHC, thickTAU, thickTDP, pthresh, cov_thresh, outputDir, networkNames, regNames, pathNames, ii)
-        # covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU / Z score VERSION!!
-        covMatList_Z = thicknessCovMatGenerate(N, HC_z, TAU_z, TDP_z, pthresh, cov_thresh)
-        # covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU / W score VERSION!!
-        covMatList_W = thicknessCovMatGenerate(N, HC_w, TAU_w, TDP_w, pthresh, cov_thresh)
+        covMatList_Z = thicknessCovMatGenerate(N, HC_z, TAU_z, TDP_z, pthresh, cov_thresh) # Z score 
+        covMatList_W = thicknessCovMatGenerate(N, HC_w, TAU_w, TDP_w, pthresh, cov_thresh) # W score
 
-        # COMPUTING CovMat [VOLUME]
+         #-------------------------------------------COMPUTING CovMat [VOLUME] -------------------------------------------
         # covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU / Z score VERSION!!
-        covMatList_Original_Vol = thicknessCovMatGenerate(N, volumeHC, volumeTAU, volumeTDP, pthresh, cov_thresh)
-        # covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU / Z score VERSION!!
-        covMatList_Z_Vol = thicknessCovMatGenerate(N, HC_z_Vol, TAU_z_Vol, TDP_z_Vol, pthresh, cov_thresh)
-        # covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU / W score VERSION!!
-        covMatList_W_Vol = thicknessCovMatGenerate(N, HC_w_Vol, TAU_w_Vol, TDP_w_Vol, pthresh, cov_thresh)
+        covMatList_Original_Vol = thicknessCovMatGenerate(N, volumeHC, volumeTAU, volumeTDP, pthresh, cov_thresh) 
+        covMatList_Z_Vol = thicknessCovMatGenerate(N, HC_z_Vol, TAU_z_Vol, TDP_z_Vol, pthresh, cov_thresh) # Z score 
+        covMatList_W_Vol = thicknessCovMatGenerate(N, HC_w_Vol, TAU_w_Vol, TDP_w_Vol, pthresh, cov_thresh) # W score
 
 
-        # Plotting and Saving figure
+        #------------------------------------------- Comparing the degree of the network between Control vs YesAD(Patient) vs NoAd(Patient) -------------------------------------------
         ################ THICKNESS ################
-        # 3) Comparing the degree of the network between Control vs YesAD(Patient) vs NoAd(Patient) - ORIGINAL VALUE
-        nonZeroDegCmp(covMatList_Original[0], covMatList_Original[1], covMatList_Original[2], ['HC', 'TAU', 'TDP'], 'Degree', saveName + " Thickness", outputDir, f"FTD_nonZero_degCmp_{saveName}_Original.tif")
+        nonZeroDegCmp(covMatList_Original[0], covMatList_Original[1], covMatList_Original[2], ['HC', 'TAU', 'TDP'], 'Degree', saveName + " Thickness", outputDir, f"FTD_nonZero_degCmp_{saveName}_Original.tif") # ORIGINAL VALUE
+        plt.clf()
+        nonZeroDegCmp(covMatList_Z[0], covMatList_Z[1], covMatList_Z[2], ['HC_Z', 'TAU_Z', 'TDP_Z'], 'Degree', saveName + " Thickness", outputDir, f"FTD_nonZero_degCmp_{saveName}_Z_Score.tif") # Z SCORE
+        plt.clf()     
+        nonZeroDegCmp(covMatList_W[0], covMatList_W[1], covMatList_W[2], ['HC_W', 'TAU_W', 'TDP_W'], 'Degree', saveName + " Thickness", outputDir, f"FTD_nonZero_degCmp_{saveName}_W_Score.tif") # W SCORE
         # Clear figure
         plt.clf()
-        # 3) Comparing the degree of the network between Control vs YesAD(Patient) vs NoAd(Patient) - Z SCORE
-        nonZeroDegCmp(covMatList_Z[0], covMatList_Z[1], covMatList_Z[2], ['HC_Z', 'TAU_Z', 'TDP_Z'], 'Degree', saveName + " Thickness", outputDir, f"FTD_nonZero_degCmp_{saveName}_Z_Score.tif")
-        # Clear figure
-        plt.clf()
-        # 3) Comparing the degree of the network between Control vs YesAD(Patient) vs NoAd(Patient) - W SCORE
-        nonZeroDegCmp(covMatList_W[0], covMatList_W[1], covMatList_W[2], ['HC_W', 'TAU_W', 'TDP_W'], 'Degree', saveName + " Thickness", outputDir, f"FTD_nonZero_degCmp_{saveName}_W_Score.tif")
-        # Clear figure
-        plt.clf()
-
         ################ VOLUME ################
-        nonZeroDegCmp(covMatList_Original_Vol[0], covMatList_Original_Vol[1], covMatList_Original_Vol[2], ['HC', 'TAU', 'TDP'], 'Degree', saveName + " Volume", outputDir, f"FTD_nonZero_degCmp_{saveName}_Original_VOLUME.tif")
+        nonZeroDegCmp(covMatList_Original_Vol[0], covMatList_Original_Vol[1], covMatList_Original_Vol[2], ['HC', 'TAU', 'TDP'], 'Degree', saveName + " Volume", outputDir, f"FTD_nonZero_degCmp_{saveName}_Original_VOLUME.tif") # ORIGINAL VALUE
         plt.clf()
-        nonZeroDegCmp(covMatList_Z_Vol[0], covMatList_Z_Vol[1], covMatList_Z_Vol[2], ['HC_Z', 'TAU_Z', 'TDP_Z'], 'Degree', saveName + " Volume", outputDir, f"FTD_nonZero_degCmp_{saveName}_Z_Score_VOLUME.tif")
+        nonZeroDegCmp(covMatList_Z_Vol[0], covMatList_Z_Vol[1], covMatList_Z_Vol[2], ['HC_Z', 'TAU_Z', 'TDP_Z'], 'Degree', saveName + " Volume", outputDir, f"FTD_nonZero_degCmp_{saveName}_Z_Score_VOLUME.tif") # Z SCORE
         plt.clf()
-        nonZeroDegCmp(covMatList_W_Vol[0], covMatList_W_Vol[1], covMatList_W_Vol[2], ['HC_W', 'TAU_W', 'TDP_W'], 'Degree', saveName + " Volume", outputDir, f"FTD_nonZero_degCmp_{saveName}_W_Score_VOLUME.tif")
+        nonZeroDegCmp(covMatList_W_Vol[0], covMatList_W_Vol[1], covMatList_W_Vol[2], ['HC_W', 'TAU_W', 'TDP_W'], 'Degree', saveName + " Volume", outputDir, f"FTD_nonZero_degCmp_{saveName}_W_Score_VOLUME.tif") # W SCORE
         plt.clf()
 
+        #------------------------------------------- Plot correlation scatterplot between Degree value vs Thickness / for both YesAD and NoAd  -------------------------------------------
         ################ THICKNESS ################
-        # 4) Plot correlation scatterplot between Degree value vs Thickness / for both YesAD and NoAd / ORIGINAL VALUE
         nonZeroDegCorr(thickHC, thickTAU, thickTDP, covMatList_Original[0], covMatList_Original[1], covMatList_Original[2], 'FTD_HC_' + saveName, 'FTD_TAU_' + saveName, 'FTD_TDP_' + saveName, 'Degree', 'Mean Thickness', outputDir, f"FTD_nonZero_degCorr_{saveName}_Original.tif", linear_regression = True)
-        # Clear figure
-        plt.clf()
-        # 4) Plot correlation scatterplot between Degree value vs Thickness / for both YesAD and NoAd / Z SCORE
+        plt.clf() # ORIGINAL VALUE
         nonZeroDegCorr(HC_z, TAU_z, TDP_z, covMatList_Z[0], covMatList_Z[1], covMatList_Z[2], 'FTD_HC_' + saveName + '_Z_Score', 'FTD_TAU_' + saveName + '_Z_Score', 'FTD_TDP_' + saveName + '_Z_Score', 'Degree', 'Mean Z-Score', outputDir, f"FTD_nonZero_degCorr_{saveName}_Z_Score.tif", linear_regression = True)
-        # Clear figure
-        plt.clf()
-        # 4) Plot correlation scatterplot between Degree value vs Thickness / for both YesAD and NoAd / W SCORE
+        plt.clf() # Z SCORE
         nonZeroDegCorr(HC_w, TAU_w, TDP_w, covMatList_W[0], covMatList_W[1], covMatList_W[2], 'FTD_HC_' + saveName + '_W_Score', 'FTD_TAU_' + saveName + '_W_Score', 'FTD_TDP_' + saveName + '_W_Score', 'Degree', 'Mean W-Score', outputDir, f"FTD_nonZero_degCorr_{saveName}_W_Score.tif", linear_regression = True)
-        # Clear figure
-        plt.clf()
+        plt.clf() # W SCORE
 
         ################ VOLUME ################
         nonZeroDegCorr(volumeHC, volumeTAU, volumeTDP, covMatList_Original_Vol[0], covMatList_Original_Vol[1], covMatList_Original_Vol[2], 'FTD_HC_' + saveName, 'FTD_TAU_' + saveName, 'FTD_TDP_' + saveName, 'Degree', 'Mean Volume', outputDir, f"FTD_nonZero_degCorr_{saveName}_Original_VOLUME.tif", linear_regression = True)
-        plt.clf()
+        plt.clf() # ORIGINAL VALUE
         nonZeroDegCorr(HC_z_Vol, TAU_z_Vol, TDP_z_Vol, covMatList_Z_Vol[0], covMatList_Z_Vol[1], covMatList_Z_Vol[2], 'FTD_HC_' + saveName + '_Z_Score', 'FTD_TAU_' + saveName + '_Z_Score', 'FTD_TDP_' + saveName + '_Z_Score', 'Degree', 'Mean Z-Score (Volume)', outputDir, f"FTD_nonZero_degCorr_{saveName}_Z_Score_VOLUME.tif", linear_regression = True)
-        plt.clf()
+        plt.clf() # Z SCORE
         nonZeroDegCorr(HC_w_Vol, TAU_w_Vol, TDP_w_Vol, covMatList_W_Vol[0], covMatList_W_Vol[1], covMatList_W_Vol[2], 'FTD_HC_' + saveName + '_W_Score', 'FTD_TAU_' + saveName + '_W_Score', 'FTD_TDP_' + saveName + '_W_Score', 'Degree', 'Mean W-Score (Volume)', outputDir, f"FTD_nonZero_degCorr_{saveName}_W_Score_VOLUME.tif", linear_regression = True)
-        plt.clf()
+        plt.clf() # W SCORE
 
 
-        # 5) Plot various Covaraiance Matrix 
-        if plotON:
+        #------------------------------------------- Plot various Covariance Matrix -------------------------------------------
+        plotCovMat = False
+        if plotCovMat: # Draw various Covaraiance Matrix
+            # Covariance Matrix of Healthy Control, TAU, TDP
+            drawCovMatrix(covMatList_Original[0], regNames, regNames, 'FTD HC Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_HC.png", annot_bool = False)
+            drawCovMatrix(covMatList_Original[1], regNames, regNames, 'FTD TAU Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TAU.png", annot_bool = False)
+            drawCovMatrix(covMatList_Original[2], regNames, regNames, 'FTD TDP Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TDP.png", annot_bool = False)
 
-            plotCovMat = False
+            # Covariance Matrix - TAU, TDP comparing to Healthy Control
+            drawCovMatrix(covMatList_Original[3], regNames, regNames, 'FTD TAU > HC Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TAU_gt_HC_pthresh_{pthresh}.png", annot_bool = False)
+            drawCovMatrix(covMatList_Original[4], regNames, regNames, 'FTD TDP > HC Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TDP_gt_HC_{pthresh}.png", annot_bool = False)
+            drawCovMatrix(covMatList_Original[5], regNames, regNames, 'FTD TAU < HC Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TAU_lt_HC_{pthresh}.png", annot_bool = False)
+            drawCovMatrix(covMatList_Original[6], regNames, regNames, 'FTD TDP < HC Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TDP_lt_HC_{pthresh}.png", annot_bool = False)
 
-            if plotCovMat: # Draw various Covaraiance Matrix
-                # Covariance Matrix of Control, TAU, TDP
-                drawCovMatrix(covMatList_Original[0], regNamesRaw, regNamesRaw, 'FTD HC Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_HC.png", annot_bool = False)
-                drawCovMatrix(covMatList_Original[1], regNamesRaw, regNamesRaw, 'FTD TAU Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TAU.png", annot_bool = False)
-                drawCovMatrix(covMatList_Original[2], regNamesRaw, regNamesRaw, 'FTD TDP Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TDP.png", annot_bool = False)
+            # Covariance Matrix  - comparing TAU vs TDP
+            drawCovMatrix(covMatList_Original[7], regNames, regNames, 'FTD TAU > TDP Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TAU_gt_TDP_{pthresh}.png", annot_bool = False)
+            drawCovMatrix(covMatList_Original[8], regNames, regNames, 'FTD TDP > TAU Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TDP_gt_TAU_{pthresh}.png", annot_bool = False)
+        
+        #-------------------------------------------Plot Covariance Matrix (Network) onto 3D Atlas  -------------------------------------------
+        # Only for Original Values (because Z-Score generates the same figure)
+        if plotON:   
+            # Set Fixed Density Value
+            fd_val = 100
 
-                # Covariance Matrix - TAU, TDP comparing to Control
-                drawCovMatrix(covMatList_Original[3], regNamesRaw, regNamesRaw, 'FTD TAU > HC Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TAU_gt_HC_pthresh_{pthresh}.png", annot_bool = False)
-                drawCovMatrix(covMatList_Original[4], regNamesRaw, regNamesRaw, 'FTD TDP > HC Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TDP_gt_HC_{pthresh}.png", annot_bool = False)
-                drawCovMatrix(covMatList_Original[5], regNamesRaw, regNamesRaw, 'FTD TAU < HC Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TAU_lt_HC_{pthresh}.png", annot_bool = False)
-                drawCovMatrix(covMatList_Original[6], regNamesRaw, regNamesRaw, 'FTD TDP < HC Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TDP_lt_HC_{pthresh}.png", annot_bool = False)
-
-                # Covariance Matrix  - comparing TAU vs TDP
-                drawCovMatrix(covMatList_Original[7], regNamesRaw, regNamesRaw, 'FTD TAU > TDP Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TAU_gt_TDP_{pthresh}.png", annot_bool = False)
-                drawCovMatrix(covMatList_Original[8], regNamesRaw, regNamesRaw, 'FTD TDP > TAU Covariance Matrix', outputDir, f"FTD_Thickness_{saveName}_TDP_gt_TAU_{pthresh}.png", annot_bool = False)
-            
-
-            # 6) Plot Covariance Matrix (Network) onto 3D Atlas / Only for Original Values (because Z-Score generates the same figure)
+            # Set cRange
             cRange = [0, 1]
 
+            # Set labelNames
+            LabelNames = regNames
+
+            # Set Node color --> Set as red (because cm.jet: 1 --> Red) Same for all HC/TAU/TDP
+            colorVec = np.ones(np.sum(currNetwork))
+            
+            #------------------------------------------- Original thickness values 3D Mapping -------------------------------------------
             # FOR NODE SIZE (Original Thickness Value)
             thick_HC_exp = thickHC
             thick_TAU_exp = thickTAU
@@ -279,123 +242,28 @@ def thicknessCovFTD(NetworkDataGeneral, pathLUT, HCResults, PatientTAUResults, P
             maxThick_TAU = np.nanmax(np.nanmean(thick_TAU_exp, axis=0) - minThick_TAU) + vanishing_val
             maxThick_TDP = np.nanmax(np.nanmean(thick_TDP_exp, axis=0) - minThick_TDP) + vanishing_val
             
-            # MakerVec for HC, TAU and TDP --> FOR NODE SIZE (W_SCORE)
-            # Pathology - Bigger the dot --> More disease
-            # Thickness - We still want the bigger --> More disease
-            # But on thickness the thinner the more disease. 
-            ######
-            # Change it to the same as Pathology (Normalize 0-1). And then 3 * (1 - normalized thickness value)
-            # CHECK if this makes sense in 3D Map. 
-            ######
-            MakerVecHC = np.nanmean(thick_HC_exp, axis=0)
-            MakerVecHC = 3 * (1 - ((MakerVecHC - minThick_HC) / maxThick_HC))
+            # NODE Size
+            MarkerVecHC = np.nanmean(thick_HC_exp, axis=0)
+            MarkerVecHC = 3 * (1 - ((MarkerVecHC - minThick_HC) / maxThick_HC))
 
-            MakerVecTAU = np.nanmean(thick_TAU_exp, axis=0)
-            MakerVecTAU = 3 * (1 - ((MakerVecTAU - minThick_TAU) / maxThick_TAU))
+            MarkerVecTAU = np.nanmean(thick_TAU_exp, axis=0)
+            MarkerVecTAU = 3 * (1 - ((MarkerVecTAU - minThick_TAU) / maxThick_TAU))
 
-            MakerVecTDP = np.nanmean(thick_TDP_exp, axis=0)
-            MakerVecTDP = 3 * (1 - ((MakerVecTDP - minThick_TDP) / maxThick_TDP))
-
-            # colorVec for TAU and TDP
-            # colorVecTAU = np.nanmean(thick_TAU_exp, axis=0)
-            # colorVecTDP = np.nanmean(thick_TDP_exp, axis=0)
-
-            # Node color --> Set as red (because cm.jet: 1 --> Red)
-            # colorVecTAU = np.ones(np.sum(currNetwork))
-            # colorVecTDP = np.ones(np.sum(currNetwork))
-            colorVec = np.ones(np.sum(currNetwork))
-
-            # Originally 0 - but using 3 bc 0 is not yet implemented
-            displayType = 3
-
-            LabelNames = regNames
+            MarkerVecTDP = np.nanmean(thick_TDP_exp, axis=0)
+            MarkerVecTDP = 3 * (1 - ((MarkerVecTDP - minThick_TDP) / maxThick_TDP))
 
             # Clear figure
             plt.clf()
 
-            # Images to Crop
-            HC_img = None
-            TAU_img = None
-            TDP_img = None
-            TAU_gt_HC_img = None
-            TDP_gt_HC_img = None
-            TAU_lt_HC_img = None
-            TDP_lt_HC_img = None
-            TAU_gt_TDP_img = None
-            TDP_gt_TAU_img = None
-            TAU_gt_HC_FD_img = None
-            TDP_gt_HC_FD_img = None
-            TAU_lt_HC_FD_img = None
-            TDP_lt_HC_FD_img = None
-            TAU_gt_TDP_FD_img = None
-            TDP_gt_TAU_FD_img = None
-            imglist = [HC_img, TAU_img, TDP_img, TAU_gt_HC_img, TDP_gt_HC_img, TAU_lt_HC_img, TDP_lt_HC_img, TAU_gt_TDP_img, TDP_gt_TAU_img, TAU_gt_HC_FD_img, TDP_gt_HC_FD_img, TAU_lt_HC_FD_img, TDP_lt_HC_FD_img, TAU_gt_TDP_FD_img, TDP_gt_TAU_FD_img]
+            # 3D mapping of Original Thickness Values
+            thickness3DMapping(covMatList_Original, NetworkDataGeneral, currCoM, LabelNames, cRange, MarkerVecHC, MarkerVecTAU, MarkerVecTDP, colorVec, outputDir, pthresh, fd_val, FD = True, W_Score = False)
 
-            covMatlist = covMatList_Original
-            # MODIFY the last 6 covMat in covMatlist for FixedDensity
-            fd_val = 100 # Get top 100
-            for i in range(9, 15):
-                covMatlist[i] = fixedDensity(covMatlist[i], fd_val)
 
-            covMatNamelist = ['covMatHC', 'covMatTAU', 'covMatTDP', 'cmpCovTAU_gt_HC', 'cmpCovTDP_gt_HC', 'cmpCovTAU_lt_HC', 'cmpCovTDP_lt_HC', 'cmpCovTAU_gt_TDP', 'cmpCovTDP_gt_TAU', f'cmpCovTAU_gt_HC_FD_{fd_val}', f'cmpCovTDP_gt_HC_FD_{fd_val}', f'cmpCovTAU_lt_HC_FD_{fd_val}', f'cmpCovTDP_lt_HC_FD_{fd_val}', f'cmpCovTAU_gt_TDP_FD_{fd_val}', f'cmpCovTDP_gt_TAU_FD_{fd_val}']
-            MakerVecList = [MakerVecHC, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP]
-            
-            for j in range(len(covMatlist)):
-                # Define figure
-                fig_atlas = plt.figure()
-
-                # Define MakerVec to Use / Same np.ones(np.sum(currNetwork))
-                MakerVec = MakerVecList[j]
-
-                # Edge color colormap
-                if j == 0 or j == 1 or j == 2:
-                    covType = 'original'
-                else:
-                    covType = 'sig'
-
-                # [covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU]
-                plotNetwork3Individual(fig_atlas, covMatlist[j], NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVec, colorVec, 3, showLabels = 0, covType = covType)
-
-                fig_atlas.tight_layout()
-
-                # Save Graph Object
-                save3DGraph(covMatlist[j], outputDir, covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}')
-
-                # Save the figure
-                plt.savefig(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}', dpi=1000, bbox_inches='tight')
-
-                # Read figure to crop
-                imglist[j] = Image.open(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}' + '.png')
-
-            thickness_comb_img = cropImg6(imglist[3:9])
-            thickness_comb_FD_img = cropImg6(imglist[9:])
-
-            thickness_comb_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}(Original).png')
-            thickness_comb_FD_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}(FixedDensity).png')
-
-            # Images to Crop W SCORE
-            HC_img_W = None
-            TAU_img_W = None
-            TDP_img_W = None
-            TAU_gt_HC_img_W = None
-            TDP_gt_HC_img_W = None
-            TAU_lt_HC_img_W = None
-            TDP_lt_HC_img_W = None
-            TAU_gt_TDP_img_W = None
-            TDP_gt_TAU_img_W = None
-            TAU_gt_HC_FD_img_W = None
-            TDP_gt_HC_FD_img_W = None
-            TAU_lt_HC_FD_img_W = None
-            TDP_lt_HC_FD_img_W = None
-            TAU_gt_TDP_FD_img_W = None
-            TDP_gt_TAU_FD_img_W = None
-            
-            imglist_W = [HC_img_W, TAU_img_W, TDP_img_W, TAU_gt_HC_img_W, TDP_gt_HC_img_W, TAU_lt_HC_img_W, TDP_lt_HC_img_W, TAU_gt_TDP_img_W, TDP_gt_TAU_img_W, TAU_gt_HC_FD_img_W, TDP_gt_HC_FD_img_W, TAU_lt_HC_FD_img_W, TDP_lt_HC_FD_img_W, TAU_gt_TDP_FD_img_W, TDP_gt_TAU_FD_img_W]
-
+            #------------------------------------------- W_Score thickness values 3D Mapping -------------------------------------------
             # FOR NODE SIZE (Original Thickness Value)
-            thick_HC_exp = volumeHC
-            thick_TAU_exp = volumeTAU
-            thick_TDP_exp = volumeTDP
+            thick_HC_exp = HC_w_Vol
+            thick_TAU_exp = TAU_w_Vol
+            thick_TDP_exp = TDP_w_Vol
             
             # Get the MAX/MIN Thickness values
             minThick_HC = np.nanmin(np.nanmean(thick_HC_exp, axis=0))
@@ -407,63 +275,22 @@ def thicknessCovFTD(NetworkDataGeneral, pathLUT, HCResults, PatientTAUResults, P
             maxThick_TAU = np.nanmax(np.nanmean(thick_TAU_exp, axis=0) - minThick_TAU) + vanishing_val
             maxThick_TDP = np.nanmax(np.nanmean(thick_TDP_exp, axis=0) - minThick_TDP) + vanishing_val
             
-            # MakerVec for HC, TAU and TDP --> FOR NODE SIZE (W_SCORE)
-            # Pathology - Bigger the dot --> More disease
-            # Thickness - We still want the bigger --> More disease
-            # But on thickness the thinner the more disease. 
-            ######
-            # Change it to the same as Pathology (Normalize 0-1). And then 3 * (1 - normalized thickness value)
-            # CHECK if this makes sense in 3D Map. 
-            ######
-            MakerVecHC = np.nanmean(thick_HC_exp, axis=0)
-            MakerVecHC = 3 * (1 - ((MakerVecHC - minThick_HC) / maxThick_HC))
 
-            MakerVecTAU = np.nanmean(thick_TAU_exp, axis=0)
-            MakerVecTAU = 3 * (1 - ((MakerVecTAU - minThick_TAU) / maxThick_TAU))
+            MarkerVecHC = np.nanmean(thick_HC_exp, axis=0)
+            MarkerVecHC = 3 * (1 - ((MarkerVecHC - minThick_HC) / maxThick_HC))
 
-            MakerVecTDP = np.nanmean(thick_TDP_exp, axis=0)
-            MakerVecTDP = 3 * (1 - ((MakerVecTDP - minThick_TDP) / maxThick_TDP))
+            MarkerVecTAU = np.nanmean(thick_TAU_exp, axis=0)
+            MarkerVecTAU = 3 * (1 - ((MarkerVecTAU - minThick_TAU) / maxThick_TAU))
 
-            # W-Score is for Volume!!
-            covMatlist = covMatList_W_Vol
-            # MODIFY the last 6 covMat in covMatlist for FixedDensity
-            for i in range(9, 15):
-                covMatlist[i] = fixedDensity(covMatlist[i], fd_val)
+            MarkerVecTDP = np.nanmean(thick_TDP_exp, axis=0)
+            MarkerVecTDP = 3 * (1 - ((MarkerVecTDP - minThick_TDP) / maxThick_TDP))
 
-            covMatNamelist = ['covMatHC_W', 'covMatTAU_W', 'covMatTDP_W', 'cmpCovTAU_gt_HC_W', 'cmpCovTDP_gt_HC_W', 'cmpCovTAU_lt_HC_W', 'cmpCovTDP_lt_HC_W', 'cmpCovTAU_gt_TDP_W', 'cmpCovTDP_gt_TAU_W', f'cmpCovTAU_gt_HC_FD_W_{fd_val}', f'cmpCovTDP_gt_HC_FD_W_{fd_val}', f'cmpCovTAU_lt_HC_FD_W_{fd_val}', f'cmpCovTDP_lt_HC_FD_W_{fd_val}', f'cmpCovTAU_gt_TDP_FD_W_{fd_val}', f'cmpCovTDP_gt_TAU_FD_W_{fd_val}']
-            MakerVecList = [MakerVecHC, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP, MakerVecTAU, MakerVecTDP]
-            
-            for j in range(len(covMatlist)):
-                # Define figure
-                fig_atlas = plt.figure()
+            # Clear figure
+            plt.clf()
 
-                # Define MakerVec to Use / Same np.ones(np.sum(currNetwork))
-                MakerVec = MakerVecList[j]
+            # 3D mapping of W_Score Thickness Values
+            thickness3DMapping(covMatList_W_Vol, NetworkDataGeneral, currCoM, LabelNames, cRange, MarkerVecHC, MarkerVecTAU, MarkerVecTDP, colorVec, outputDir, pthresh, fd_val, FD = True, W_Score = True)
 
-                # Edge color colormap
-                if j == 0 or j == 1 or j == 2:
-                    covType = 'original'
-                else:
-                    covType = 'sig'
 
-                # [covMatHC, covMatTAU, covMatTDP, cmpCovTAU_gt_HC, cmpCovTDP_gt_HC, cmpCovTAU_lt_HC, cmpCovTDP_lt_HC, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU]
-                plotNetwork3Individual(fig_atlas, covMatlist[j], NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currCoM, LabelNames, cRange, MakerVec, colorVec, 3, showLabels = 0, covType = covType)
-
-                fig_atlas.tight_layout()
-
-                # Save Graph Object
-                save3DGraph(covMatlist[j], outputDir, covMatNamelist[j] + f'_pthresh_{str(pthresh).split(".")[1]}_WScore')
-
-                # Save the figure
-                plt.savefig(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + '_WSCORE' + f'_pthresh_{str(pthresh).split(".")[1]}', dpi=1000, bbox_inches='tight')
-
-                # Read figure to crop
-                imglist_W[j] = Image.open(outputDir + '/Thickness_3D_Atlas_' + covMatNamelist[j] + '_WSCORE' + f'_pthresh_{str(pthresh).split(".")[1]}' + '.png')
-
-            thickness_comb_img_W = cropImg6(imglist_W[3:9])
-            thickness_comb_FD_img_W = cropImg6(imglist_W[9:])
-
-            thickness_comb_img_W.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}(WSCORE_Original).png')
-            thickness_comb_FD_img_W.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}(WSCORE_FixedDensity).png')
 
         
