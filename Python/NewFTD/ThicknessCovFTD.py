@@ -215,7 +215,7 @@ def thicknessCovFTD(NetworkDataGeneral, pathLUT, HCResults, PatientTAUResults, P
         # Only for Original Values (because Z-Score generates the same figure)
         if plotON:   
             # Set Fixed Density Value
-            fd_val = 100
+            fd_val = 40
 
             # Set cRange
             cRange = [0, 1]

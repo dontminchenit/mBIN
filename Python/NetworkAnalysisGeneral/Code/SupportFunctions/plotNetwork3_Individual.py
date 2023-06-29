@@ -34,6 +34,10 @@ def plotNetwork3Individual(currFig, adjMtx, GIImesh, CoM, LabelNames, cRange, Ma
 
     # Get graph of adjMtx
     G = nx.Graph(adjMtx)
+    
+    # Printing number of edges
+    print("Number of edges")
+    print(len(G.edges()))
 
     # plotNames = ['L-Lateral', 'Dorsal']
 

@@ -97,11 +97,15 @@ def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotO
             covMatlist[1] = np.delete(covMatlist[1], TDP_missing_index, axis = 0) # TDP Cov Mat
             covMatlist[2] = np.delete(covMatlist[2], TAU_missing_index, axis = 0) # TAU_gt_TDP Cov Mat
             covMatlist[3] = np.delete(covMatlist[3], TDP_missing_index, axis = 0) # TDP_gt_TAU Cov Mat
+            covMatlist[4] = np.delete(covMatlist[4], TAU_missing_index, axis = 0) # covTAU_gt_TDP_raw
+            covMatlist[5] = np.delete(covMatlist[5], TDP_missing_index, axis = 0) # covTDP_gt_TAU_raw
             # Columns
             covMatlist[0] = np.delete(covMatlist[0], TAU_missing_index, axis = 1) # TAU Cov Mat
             covMatlist[1] = np.delete(covMatlist[1], TDP_missing_index, axis = 1) # TDP Cov Mat
             covMatlist[2] = np.delete(covMatlist[2], TAU_missing_index, axis = 1) # TAU_gt_TDP Cov Mat
             covMatlist[3] = np.delete(covMatlist[3], TDP_missing_index, axis = 1) # TDP_gt_TAU Cov Mat
+            covMatlist[4] = np.delete(covMatlist[4], TAU_missing_index, axis = 1) # covTAU_gt_TDP_raw
+            covMatlist[5] = np.delete(covMatlist[5], TDP_missing_index, axis = 1) # covTDP_gt_TAU_raw
 
             # Also modify path_TAU/path_TDP Data to exclude these regions (columns)
             path_TAU = np.delete(path_TAU, TAU_missing_index, axis = 1)
@@ -129,6 +133,9 @@ def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotO
             drawCovMatrix(covMatlist[3], pathNames_TDP, pathNames_TDP, 'FTD - TDP > TAU' + suffix_M, outputDir, 'FTD_TDP_GT_TAU' + suffix_M + '.png', annot_fontsize = 2) # TDP_gt_TAU cov Mat
 
             if plotON: # If we want to plot the 3D Mapping
+                # Set fixed density value
+                fd_val = 40 # Get top 100
+
                 # Log %AO of FTD TAU vs TDP
                 path_TAU_exp = path_TAU.copy()
                 path_TDP_exp = path_TDP.copy()
@@ -151,6 +158,6 @@ def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotO
                 colorVecTDP = np.ones(path_TDP_exp.shape[1])
 
                 # 3D Atlas Mapping
-                path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, MarkerVecTAU, colorVecTAU, CoM_TDP, pathNames_TDP, MarkerVecTDP, colorVecTDP, cRange, outputDir, suffix_M)
+                path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, MarkerVecTAU, colorVecTAU, CoM_TDP, pathNames_TDP, MarkerVecTDP, colorVecTDP, cRange, outputDir, suffix_M, fd_val)
 
     return LabelNames, TAU_missing_index_GM, TDP_missing_index_GM, TAU_missing_index_WM, TDP_missing_index_WM

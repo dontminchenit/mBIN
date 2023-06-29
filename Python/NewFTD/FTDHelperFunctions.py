@@ -96,6 +96,8 @@ def pathCovGen(TAUData, TDPData, pthresh, cov_thresh):
     2) TDP
     3) TAU_gt_TDP
     4) TDP_gt_TAU
+    5) covTAU_gt_TDP_raw
+    6) covTDP_gt_TAU_raw
 
     Args:
         TAUData (ndarray): log %AO of TAU Pathology Data
@@ -104,7 +106,7 @@ def pathCovGen(TAUData, TDPData, pthresh, cov_thresh):
         cov_thresh (float): covariance matrix threshold (just to make suere there is no noise)
 
     Returns:
-        [covTAU, covTDP, covTAU_gt_TDP, covTDP_gt_TAU] (list of ndarray): list of 4 cov mat we calculated
+        [covTAU, covTDP, covTAU_gt_TDP, covTDP_gt_TAU, covTAU_gt_TDP_raw, covTDP_gt_TAU_raw] (list of ndarray): list of 6 cov mat we calculated
     """
     # Sanity Check
     assert(TAUData.shape[1] == TDPData.shape[1])
@@ -121,6 +123,9 @@ def pathCovGen(TAUData, TDPData, pthresh, cov_thresh):
     # For Significance difference in Covariance value
     covTAU_gt_TDP = np.full((N,N), np.nan)
     covTDP_gt_TAU = np.full((N,N), np.nan)
+
+    covTAU_gt_TDP_raw = np.full((N,N), np.nan)
+    covTDP_gt_TAU_raw = np.full((N,N), np.nan)
 
     for i in range(N):
         for j in range(N):
@@ -143,11 +148,14 @@ def pathCovGen(TAUData, TDPData, pthresh, cov_thresh):
 
                 if nTAU > 3 and nTDP >3:
                     covTAU_gt_TDP[i,j] = test_corr_sig(covTDP[i,j],covTAU[i,j],nTDP,nTAU)[0] < pthresh 
+                    covTAU_gt_TDP_raw[i,j] = test_corr_sig(covTDP[i,j],covTAU[i,j],nTDP,nTAU)[0] # Get sig value
+
                     covTDP_gt_TAU[i,j] = test_corr_sig(covTAU[i,j],covTDP[i,j],nTAU,nTDP)[0] < pthresh
+                    covTDP_gt_TAU_raw[i,j] = test_corr_sig(covTAU[i,j],covTDP[i,j],nTAU,nTDP)[0] # get sig value
 
-    return [covTAU, covTDP, covTAU_gt_TDP, covTDP_gt_TAU]
+    return [covTAU, covTDP, covTAU_gt_TDP, covTDP_gt_TAU, covTAU_gt_TDP_raw, covTDP_gt_TAU_raw]
 
-def path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, MarkerVecTAU, colorVecTAU, CoM_TDP, pathNames_TDP, MarkerVecTDP, colorVecTDP, cRange, outputDir, suffix_M):
+def path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, MarkerVecTAU, colorVecTAU, CoM_TDP, pathNames_TDP, MarkerVecTDP, colorVecTDP, cRange, outputDir, suffix_M, fd_val):
     """3D mapping of the Pathology Data Analysis
 
     Args:
@@ -168,16 +176,25 @@ def path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, Marker
     # Images to Crop
     TAU_img = None
     TDP_img = None
+
     TAU_GT_TDP_img = None
     TDP_GT_TAU_img = None
 
-    covMatNamelist = ['CovMat_FTD_TAU', 'CovMat_FTD_TDP', 'FTD_TAU_GT_TDP', 'FTD_TDP_GT_TAU']
-    imglist = [TAU_img, TDP_img, TAU_GT_TDP_img, TDP_GT_TAU_img]
+    # Fixed Density Part
+    TAU_GT_TDP_FD_img = None
+    TDP_GT_TAU_FD_img = None
+
+    # MODIFY the last 6 covMat in covMatlist for FixedDensity
+    for i in range(4, 6):
+        covMatlist[i] = fixedDensity(covMatlist[i], fd_val)
+
+    covMatNamelist = ['CovMat_FTD_TAU', 'CovMat_FTD_TDP', 'CovMat_FTD_TAU_GT_TDP', 'CovMat_FTD_TDP_GT_TAU', f'CovMat_TAU_gt_TDP_FD_{fd_val}', f'CovMat_TDP_gt_TAU_FD_{fd_val}']
+    imglist = [TAU_img, TDP_img, TAU_GT_TDP_img, TDP_GT_TAU_img, TAU_GT_TDP_FD_img, TDP_GT_TAU_FD_img]
     for j in range(len(covMatlist)):
         # Define figure
         fig_atlas = plt.figure()
 
-        if j == 0 or j == 2: # TAU part
+        if j == 0 or j == 2 or j == 4: # TAU part
             currPathCoM = CoM_TAU
             currLabelNames = pathNames_TAU
             currMarkerVec = MarkerVecTAU
@@ -209,7 +226,7 @@ def path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, Marker
         imglist[j] = Image.open(outputDir + '/3D_Atlas_' + covMatNamelist[j] + suffix_M + '.png')
         
         
-    comb_img = cropImg4(imglist)
+    comb_img = cropImg6(imglist)
     comb_img.save(outputDir + f'/FTD{suffix_M}.png')
 
 ####################################################################################################################################################
@@ -656,10 +673,11 @@ def fixedDensity(covMat, N):
     flatArray_Sorted = np.sort(flatArray)
 
     # Get the Nth smallest value (P-value)
+    N = 2 * N # Because it is adjacency matrix
     threshVal = flatArray_Sorted[N-1]
 
     # Return a CovMat, that only keeps the smallest N values. Everything else --> NaN
-    fixedDcovMat = np.where(covMat < threshVal, covMat, np.nan) # True / False
+    fixedDcovMat = np.where(covMat <= threshVal, covMat, np.nan) # True / False
 
     return fixedDcovMat
 
@@ -758,9 +776,6 @@ def thickness3DMapping(covMatlist, NetworkDataGeneral, currCoM, LabelNames, cRan
         thickness_comb_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}(Original).png')
         thickness_comb_FD_img.save(outputDir + f'/Combined_FTD_Thickness_pthresh_{str(pthresh).split(".")[1]}(FixedDensity).png')
 ####################################################################################################################################################
-
-
-
 
 ############################################################### THICKNESS AT PATH PART ##############################################################
 def thicknessAtPathFewObs(covMatlist, TAU_missing_index, TDP_missing_index):

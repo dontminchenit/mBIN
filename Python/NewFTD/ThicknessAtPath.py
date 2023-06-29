@@ -235,7 +235,7 @@ def thicknessAtPath(outputDir, NetworkDataGeneral, pathCoM, LabelNames_Path, HCt
             cRange = [0, 1]
             
             # Set fixed density value
-            fd_val = 100 # Get top 100
+            fd_val = 40 # Get top 100
             
             # Node color --> Set as red (because cm.jet: 1 --> Red)
             colorVecHC = np.ones(HCthicknessAtPath.shape[1])
