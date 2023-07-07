@@ -119,7 +119,6 @@ def thickLoadData(dataDir):
         PatientTAUResults (dict): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of TAU Patients
         PatientTDPResults (dict): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of TDP Patients
     """
-
     # MRI Thickness value for All Subjects - schaefer400x7
     thicknessAllraw = pd.read_csv(os.path.join(dataDir, 'NewFTDData', 'invivoPathCohort_quantsSubSesSchaefer400_tian12.csv'), dtype={'id': str})
 
@@ -261,9 +260,9 @@ def loaddataFTD(baseDir, dataDir, outputDir, NetworkDataGeneral):
         pathT_WM (DataFrame): Pathology %AO data for WM
         sn (int): Number of areas we are able to map to 3D Atlas / 20 
         pathLUT (DataFrame): Look up table matching Atlas region names to Atlas Labels (Index) in NetworkDataGeneral Object
-        HCResults (dict): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of Healthy Control Subjects
-        PatientTAUResults (dict): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of TAU Patients
-        PatientTDPResults (dict): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of TDP Patients
+        HCResults (dict of ndarrays): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of Healthy Control Subjects
+        PatientTAUResults (dict of ndarrays): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of TAU Patients
+        PatientTDPResults (dict of ndarrays): Dictionary containing Thickness (Mean, Median), Volume (Total, ICV, Normalized), Age, Sex of TDP Patients
         HCthicknessAtPath (ndarray): Thickness values of Healthy Control Subjects Matching Pathology Regions
         TAUthicknessAtPath (ndarray): Thickness values of TAU Patient Subjects Matching Pathology Regions
         TDPthicknessAtPath (ndarray): Thickness values of TDP Patient Subjects Matching Pathology Regions

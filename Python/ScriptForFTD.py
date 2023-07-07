@@ -22,6 +22,8 @@ outputDir='/Users/hyung/Research23_Network_Analysis/NetworkAnalysisData-selected
 # loads the preconstructed atlas data
 NetworkDataGeneral = scipy.io.loadmat(os.path.join(baseDir, 'NetworkAnalysisGeneral', 'FTDGeneralData_20221114.mat'))
 
+print(type(NetworkDataGeneral))
+
 t0 = time.time()
 
 # Loading Data into desired format
@@ -30,7 +32,7 @@ pathCoM, pathT_GM, pathT_WM, pathLUT, HCResults, PatientTAUResults, PatientTDPRe
 print('LOADING DONE')
 
 # Pathology Analysis
-print('PATH START')
+print('PATH START')√
 LabelNames_Path, TAU_missing_index_GM, TDP_missing_index_GM, TAU_missing_index_WM, TDP_missing_index_WM = pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotON = True)
 print('PATH DONE')
 
