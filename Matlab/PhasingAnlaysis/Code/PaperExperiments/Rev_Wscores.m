@@ -1,8 +1,10 @@
+macBase='/Users/min/Dropbox (Personal)/Research/Projects/FTD/PhasingAnalysis/';
+winBase='D:\Min\Dropbox (Personal)\Research\Projects\FTD\PhasingAnalysis\';
+currBase = macBase;
 %loaddata
-ctrlVols = readtable('D:\Min\Dropbox (Personal)\Research\Projects\FTD\PhasingAnalysis\Data\w-score\ctrl_vl250.csv');
-
-ctrldemo = readtable('D:\Min\Dropbox (Personal)\Research\Projects\FTD\PhasingAnalysis\Data\w-score\ctrl_demos.csv');
-subDemo = readtable('D:\Min\Dropbox (Personal)\Research\Projects\FTD\PhasingAnalysis\Data\w-score\mc_revisions_bvols_mmse_cdr.csv');
+ctrlVols = readtable(fullfile(currBase,'Data','w-score','ctrl_vl250.csv'));
+ctrldemo = readtable(fullfile(currBase,'Data','w-score','ctrl_demos.csv'));
+subDemo = readtable(fullfile(currBase,'Data','w-score','mc_revisions_bvols_mmse_cdr.csv'));
 
 NCtrl = height(ctrldemo);
 CtrlVolsData = nan(NCtrl,numLab);
@@ -18,11 +20,12 @@ end
 
 NSub = height(subDemo);
 SubVolsData = nan(NSub,numLab);
+SubVolsThick = nan(NSub,numLab);
 SubTotalVol = subDemo.BVOL;
 SubAge = subDemo.AgeatMRI;
 SubSex = strcmpi(subDemo.Sex,'Female');
 
-dataDir='D:\Min\Dropbox (Personal)\Research\Projects\FTD\PhasingAnalysis\Data\pathcsvs20210125\csvsSent';
+dataDir=fullfile(currBase,'Data','pathcsvs20210125','csvsSent');
 for i = 1:NSub
     currID = subDemo.INDDID(i);
 
@@ -32,6 +35,10 @@ for i = 1:NSub
     currLabesl = currAllData.label(volIdx);
     currVols = currAllData.value(volIdx);
     SubVolsData(i,:)=currVols;
+
+    currThickIdx =strcmp(currAllData.metric,'mean') & strcmp(currAllData.measure,'thickness') & strcmp(currAllData.system,'lausanne250');
+    currThick = currAllData.value(currThickIdx);
+    SubVolsThick(i,:)=currThick;
 end
 %calculate control coefficients
 

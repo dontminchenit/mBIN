@@ -22,7 +22,7 @@ else
     names={'1->2','1->3','1->4','1->5','1->6'};
 end
 for s=1:SN
-    [H pval]=ttest2(allData(:,s,1),allData(:,s,2))
+    [H pval ci stats]=ttest2(allData(:,s,1),allData(:,s,2))
     
     %pval = ranksum(allData(:,s,1),allData(:,s,2))
     if(pval<0.05)

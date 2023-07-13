@@ -128,6 +128,6 @@ pvalues = nan(5,1);
 print(H2,fullfile(saveDirBase,'fig8b_prioncount.tif'),'-dpng','-r400');
 
 for s=1:5
-    [h  p]= ttest2(allData(:,s,1),allData(:,s,2));
+    [H pval ci stats]= ttest2(allData(:,s,1),allData(:,s,2))
     pvalues(s)=p;
 end
