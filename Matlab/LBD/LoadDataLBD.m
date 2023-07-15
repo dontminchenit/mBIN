@@ -6,7 +6,9 @@
 
 currBase=dataDir;
 baseSaveDir=outputDir;
+
 mkdir(baseSaveDir)
+
 demoT = readtable(fullfile(currBase,'LBDData','MRI Schaeffer Demographics classification.xlsx'));
 pathT = readtable(fullfile(currBase,'LBDData','LBD_AO_aSYN.csv'));
 measuresT=readtable(fullfile(currBase,'LBDData','LBD neuropsych annualized change no formulas.xlsx'));
@@ -26,6 +28,7 @@ ctrlIDs = unique(thicknessCtrlraw.id);
 %thicknessTauTDP = readtable(fullfile(currBase,'Data','tautdp_4007.csv'));
 
 thickIDs=demoT.INDDID;
+
 thicknessAllraw=readtable(fullfile(currBase,'LBDData','ftdc_dlb_ctx_volume.csv'));
 volAllraw = readtable(fullfile(currBase,'LBDData','ftdc_dlb_tian_s1.csv'));
 
@@ -39,6 +42,7 @@ AllIDs = pathT.INDDID;
 numLab=400;
 
 mkdir(fullfile(currBase,'proccessedResultsLBD'));
+
 thicknessSaveFile=fullfile(currBase,'proccessedResultsLBD','thicknessVales.mat');
 subVolSaveFile=fullfile(currBase,'proccessedResultsLBD','subVolSaveFile.mat');
 thicknessSaveFileCtrl=fullfile(currBase,'proccessedResultsLBD','thicknessValesCtrl.mat');
@@ -46,8 +50,8 @@ subVolSaveFileCtrl=fullfile(currBase,'proccessedResultsLBD','subVolSaveFileCtrl.
 
 [AllResults] = LoadNetworkDataByID(thickIDs,thicknessAllraw,thicknessSaveFile,'schaefer400x7v1',400);
 [SubCorticalVol] = LoadNetworkDataByID2(thickIDs,volAllraw,subVolSaveFile,'Tian_Subcortex_S1_3T',16);
-
 [CtrlResults] = LoadNetworkDataByID(ctrlIDs,thicknessCtrlraw,thicknessSaveFileCtrl,'schaefer400x7',400);
+
 %[SubCorticalVolCtrl] = LoadNetworkDataByID(ctrlIDs,subcorticalVolCtrlraw,subVolSaveFileCtrl,'Tiavn_Subcortex_S1_3T',16);
 %load(thicknessSaveFileCtrl)
 
@@ -55,13 +59,14 @@ subVolSaveFileCtrl=fullfile(currBase,'proccessedResultsLBD','subVolSaveFileCtrl.
 %load Path data
 %atlasBase=fullfile(winBase,'InvivoPath','Data');
 atlasBase=currBase;  
-pathLUT = readtable(fullfile(atlasBase,'schaefer_path_20210719_20220328.csv'));
 
+pathLUT = readtable(fullfile(atlasBase,'schaefer_path_20210719_20220328.csv'));
 AtlasToPathLUT = readtable(fullfile(currBase,'LBDData','PathToAtlasLUT_10_7_2022.xlsx'));
 
 [pathCoMunordered, pathToAtlasIndexunordered] = findPathCoM(pathLUT,AtlasToPathLUT,NetworkDataGeneral.Schaefer400x7.CoM);
 pathCoM=nan(SN,3,2);
 pathToAtlasIndex = cell(SN,2);
+
 for s=1:SN
 
     idx = find(strcmpi(AtlasToPathLUT.PathSpreadSheetNames,pathNamesRaw(s)));
