@@ -17,6 +17,7 @@ for i = 1:N
     currVal = surfDisp(i);
     surfval(surfLabels==currLabel) = currVal;
 end
+
 end
 if(alphaThresh>0)
     PlotTypeRange = 2;

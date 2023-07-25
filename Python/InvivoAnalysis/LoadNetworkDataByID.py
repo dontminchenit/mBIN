@@ -23,6 +23,7 @@ def LoadNetworkDataByID(ID, allThickVals, outMatSaveFile, atlasName, numLab):
     AllResults = {}
 
     AllResults['Age'] = np.full((N), np.nan)
+    
     AllResults['Sex'] = [None for _ in range(N)]
 
     AllResults['Thickness'] = {}

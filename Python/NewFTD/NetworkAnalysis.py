@@ -2,18 +2,33 @@ import pickle
 import networkx as nx
 from networkx.generators.random_graphs import erdos_renyi_graph
 import time
-from netrd.distance import Hamming
+from netrd.distance import Hamming, DegreeDivergence, NetSimile
 
 def hammingHelperfunction(G1, G2, G3, G4):
     dist_obj = Hamming()
+    # dist_obj = DegreeDivergence()
+    #dist_obj = NetSimile()
 
     dis_1_3 = dist_obj.dist(G1, G3)
     dis_1_2 = dist_obj.dist(G1, G2)
     dis_1_4 = dist_obj.dist(G1, G4)
+    dis_2_3 = dist_obj.dist(G2, G3)
+    dis_2_4 = dist_obj.dist(G2, G4)
+    dis_3_4 = dist_obj.dist(G3, G4)
 
-    print(f"Distance between Pathology TAU > TDP vs Thickness At Path TAU > TDP: {dis_1_3}")
-    print(f"Distance between Pathology TAU > TDP vs Pathology TDP > TAU: {dis_1_2}")
-    print(f"Distance between Pathology TAU > TDP vs Thickness At Path TDP > TAU FD: {dis_1_4}")
+    # print(f"Distance between Pathology TAU > TDP vs Thickness At Path TAU > TDP: {dis_1_3}")
+    # print(f"Distance between Pathology TAU > TDP vs Pathology TDP > TAU: {dis_1_2}")
+    # print(f"Distance between Pathology TAU > TDP vs Thickness At Path TDP > TAU: {dis_1_4}")
+    # print(f"Distance between Pathology TDP > TAU vs Thickness At Path TAU > TDP: {dis_2_3}")
+    # print(f"Distance between Pathology TDP > TAU vs Thickness At Path TDP > TAU: {dis_2_4}")
+    # print(f"Distance between Thickness TAU > TDP vs Thickness At Path TDP > TAU: {dis_3_4}")
+    print(f"#1 vs #3: {dis_1_3}")
+    print(f"#1 vs #2: {dis_1_2}")
+    print(f"#1 vs #4: {dis_1_4}")
+    print(f"#2 vs #3: {dis_2_3}")
+    print(f"#2 vs #4: {dis_2_4}")
+    print(f"#3 vs #4: {dis_3_4}")
+
 
 outputDir='/Users/hyung/Research23_Network_Analysis/NetworkAnalysisData-selected/Output_Python_NewFTD'
 

@@ -10,7 +10,7 @@ import seaborn as sns
 from PIL import Image
 
 sys.path.insert(1, "/Users/hyung/Research23_Network_Analysis/mBIN/Python/NetworkAnalysisGeneral/Code/SupportFunctions/")
-from analysisVisualization import drawCovMatrix
+from analysisVisualization import drawCovMatrix, nonZeroDegCorr_Path
 from FTDHelperFunctions import pathCovGen, pathObsThresh, path3DMapping
 
 def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotON = True):
@@ -69,7 +69,8 @@ def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotO
             FTD_TDPIndx = (pathT.Tau1_TDP2 == 2) # False or True
 
             # Get Log %AO of 22 anatomical regions of the brain
-            pathData = np.ma.log(0.01 * pathT.iloc[:, 5:].values + 0.00015).filled(np.nan) # Masked log for handling the case where the value is NaN
+            #pathData = np.ma.log(0.01 * pathT.iloc[:, 5:].values + 0.00015).filled(np.nan) # Masked log for handling the case where the value is NaN
+            pathData = np.ma.log(pathT.iloc[:, 5:].values + 0.00015).filled(np.nan)
 
             # Log %AO of FTD TAU vs TDP
             path_TAU = pathData[FTD_TAUIndx,:]
@@ -131,6 +132,11 @@ def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotO
             drawCovMatrix(covMatlist[1], pathNames_TDP, pathNames_TDP, 'FTD_TDP' + suffix_M, outputDir, 'CovMat_FTD_TDP' + suffix_M + '.png', annot_fontsize = 2) # TDP cov Mat
             drawCovMatrix(covMatlist[2], pathNames_TAU, pathNames_TAU, 'FTD: TAU > TDP' + suffix_M, outputDir, 'FTD_TAU_GT_TDP' + suffix_M + '.png', annot_fontsize = 2) # TAU_gt_TDP cov Mat
             drawCovMatrix(covMatlist[3], pathNames_TDP, pathNames_TDP, 'FTD - TDP > TAU' + suffix_M, outputDir, 'FTD_TDP_GT_TAU' + suffix_M + '.png', annot_fontsize = 2) # TDP_gt_TAU cov Mat
+
+            # Draw Nodal Strength vs %AO
+            # def nonZeroDegCorr_Path(TAUData, TDPData, covMatTAU, covMatTDP, subplot1_title, subplot2_title, x_label, y_label, outputDir, outputName, linear_regression = False):
+            nonZeroDegCorr_Path(path_TAU, path_TDP, covMatlist[0], covMatlist[1], 'FTD_TAU' + suffix_M, 'FTD_TDP' + suffix_M, 'Degree', 'Mean Thickness', outputDir, f"FTD_nonZero_degCorr_Path_{suffix_M}.tif", linear_regression = True)
+            plt.clf()
 
             if plotON: # If we want to plot the 3D Mapping
                 # Set fixed density value

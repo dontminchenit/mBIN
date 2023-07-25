@@ -190,7 +190,59 @@ def nonZeroDegCorr(ctrl, thickyesAD, thicknoAD, covMatCtrl, covMatyesAD, covMatn
     # save figure
     fig.savefig(os.path.join(outputDir, outputName), dpi=400, format='tif')
 
+def nonZeroDegCorr_Path(TAUData, TDPData, covMatTAU, covMatTDP, subplot1_title, subplot2_title, x_label, y_label, outputDir, outputName, linear_regression = False):
+    
+    # Copy the Covariance Matrix and set negative values as zero
+    covMatTAUnz = covMatTAU.copy()
+    covMatTAUnz[covMatTAUnz < 0] = 0
 
+    covMatTDPnz = covMatTDP.copy()
+    covMatTDPnz[covMatTDPnz < 0] = 0
+
+    # Get sum of covariance values for all regions respective to each region
+    # Similar to computing the degree of nodes in a Network
+    degTAU = np.sum(covMatTAUnz, axis=0, where=~np.isnan(covMatTAUnz)) 
+    degTDP = np.sum(covMatTDPnz, axis=0, where=~np.isnan(covMatTDPnz))
+
+    # Define figure
+    fig = plt.figure()
+    ax1 = fig.add_subplot(1, 3, 1)
+    ax2 = fig.add_subplot(1, 3, 2)
+
+    # Draw Scatter Plot / empty circle with blue edges
+    ax1.scatter(degTAU, np.nanmean(TAUData, axis=0), facecolors='none', edgecolors='b')
+    ax2.scatter(degTDP, np.nanmean(TDPData, axis=0), facecolors='none', edgecolors='b') 
+   
+    # Get r and p-value
+    r1, p1 = scipy.stats.pearsonr(degTAU, np.nanmean(TAUData, axis=0))
+    r2, p2 = scipy.stats.pearsonr(degTDP, np.nanmean(TDPData, axis=0))
+
+    # Set title for each subplot
+    ax1.set_title(subplot1_title + f", r={r1:.6f}, p={p1:.6f}", fontsize=5)
+    ax2.set_title(subplot2_title + f", r={r2:.6f}, p={p2:.6f}", fontsize=5)
+
+    # Draw Linear Regression Line (is set to True)
+    if linear_regression:
+        # Obtain m (slope) and b(intercept) of linear regression line
+        m1, b1 = np.polyfit(degTAU, np.nanmean(TAUData, axis=0), 1)
+        m2, b2 = np.polyfit(degTDP, np.nanmean(TDPData, axis=0), 1)
+        
+        #add linear regression line to scatterplot 
+        ax1.plot(degTAU, m1*degTAU+b1, color="red")
+        ax2.plot(degTDP, m2*degTDP+b2, color="red")
+
+    # Set X and Y Labels
+    ax1.set_xlabel(x_label)
+    ax1.set_ylabel(y_label)
+    ax2.set_xlabel(x_label)
+    # ax2.set_ylabel(y_label)
+
+    # Set tick fontsize
+    ax1.tick_params(axis='both', which='major', labelsize=5)
+    ax2.tick_params(axis='both', which='major', labelsize=5)
+
+    # save figure
+    fig.savefig(os.path.join(outputDir, outputName), dpi=400, format='tif')
 
 
 def get_concat_h(im1, im2):
