@@ -4,7 +4,6 @@ from matplotlib import gridspec
 import os
 from scipy.stats import norm
 import sys
-from numpy import nan
 import numpy.ma as ma
 import seaborn as sns
 from PIL import Image
@@ -41,7 +40,7 @@ def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotO
     TAU_missing_index_WM = []
     TDP_missing_index_WM = []
 
-    # GMWM_list = [pathT_GM, pathT_WM]
+    # GMWM_list = [pathT_GM, pathT_WM] ***
     # suffix_GMWM = ['_GM', '_WM']
     GMWM_list = [pathT_GM] # ONLY DO GM For NOW
     suffix_GMWM = ['_GM']
@@ -55,24 +54,24 @@ def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotO
             # covariance matrix threshold
             cov_thresh = 0.1 # just to make sure there is no Noise
        
-            # Pathology Dataframe to Analyze
+            # Pathology Dataframe to Analyze ***
             pathT = GMWM_list[i]
 
             # Suffix denoting if the analysis is on GM or WM
             suffix_M = suffix_GMWM[i]
 
-            # List of Pathology Regions in our pathT Data. In alphabetical order (_L first and then _R)
-            pathNamesRaw  = np.array(list(pathT.columns[5:]))
+            # # List of Pathology Regions in our pathT Data. In alphabetical order (_L first and then _R)
+            # pathNamesRaw  = np.array(list(pathT.columns[5:]))
 
-            # Index for the case with tau or tdp for patients
+            # Index for the case with tau or tdp for patients *** 
             FTD_TAUIndx = (pathT.Tau1_TDP2 == 1)  # False or True
             FTD_TDPIndx = (pathT.Tau1_TDP2 == 2) # False or True
 
-            # Get Log %AO of 22 anatomical regions of the brain
+            # Get Log %AO of 22 anatomical regions of the brain ***
             #pathData = np.ma.log(0.01 * pathT.iloc[:, 5:].values + 0.00015).filled(np.nan) # Masked log for handling the case where the value is NaN
             pathData = np.ma.log(pathT.iloc[:, 5:].values + 0.00015).filled(np.nan)
 
-            # Log %AO of FTD TAU vs TDP
+            # Log %AO of FTD TAU vs TDP ***
             path_TAU = pathData[FTD_TAUIndx,:]
             path_TDP = pathData[FTD_TDPIndx,:]
 
@@ -80,7 +79,7 @@ def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotO
             covMatlist = pathCovGen(path_TAU, path_TDP, pthresh, cov_thresh)
 
             # pathCoM is the Center of mass for 20 anatomical regions A B C / For both L and R Hemisphere
-            # Covert (20, 3, 2) --> (40, 3) / first 20 rows {L} and last 20 rows {R} / Order same as pathNamesRaw repeated 2 times
+            # Covert (20, 3, 2) --> (40, 3) / first 20 rows {L} and last 20 rows {R} / Order same as LabelNames repeated 2 times
             currCoM = np.vstack((pathCoM[:, :, 0], pathCoM[:, :, 1]))
 
             ################################ Exclude regions where there is few observations ################################
@@ -91,6 +90,10 @@ def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotO
             obs_thresh = 3
 
             TAU_missing_index, TDP_missing_index = pathObsThresh(path_TAU, path_TDP, obs_thresh)
+
+            print("TESTING")
+            print(TAU_missing_index)
+            print(TDP_missing_index)
             
             # Modify the covMatlist data so exclude these regions
             # Rows
@@ -112,9 +115,9 @@ def pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotO
             path_TAU = np.delete(path_TAU, TAU_missing_index, axis = 1)
             path_TDP = np.delete(path_TDP, TDP_missing_index, axis = 1)
 
-            # Generate the pathNamesRaw list for each TAU and TDP
-            pathNames_TAU = np.delete(pathNamesRaw, TAU_missing_index)
-            pathNames_TDP = np.delete(pathNamesRaw, TDP_missing_index)
+            # Generate the LabelNames list for each TAU and TDP
+            pathNames_TAU = np.delete(LabelNames, TAU_missing_index)
+            pathNames_TDP = np.delete(LabelNames, TDP_missing_index)
 
             # Generate CoM for each TAU and TDP
             CoM_TAU = np.delete(currCoM, TAU_missing_index, axis = 0)

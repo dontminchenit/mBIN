@@ -184,7 +184,7 @@ def path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, Marker
     TAU_GT_TDP_FD_img = None
     TDP_GT_TAU_FD_img = None
 
-    # MODIFY the last 6 covMat in covMatlist for FixedDensity
+    # MODIFY the last 3 covMat in covMatlist for FixedDensity
     for i in range(4, 6):
         covMatlist[i] = fixedDensity(covMatlist[i], fd_val)
 
@@ -212,7 +212,8 @@ def path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, Marker
             covType = 'sig'
 
         # covMat_TAU, covMat_TDP, cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU
-        plotNetwork3Individual(fig_atlas, covMatlist[j], NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currPathCoM, currLabelNames, cRange, currMarkerVec, currColorVec, 3, showLabels = 0, covType = covType)
+        plotNetwork3Individual(fig_atlas, covMatlist[j], NetworkDataGeneral['NetworkDataGeneral'][0, 0]['Schaefer400x7']['GII'][0, 0], currPathCoM, 
+                               currLabelNames, cRange, currMarkerVec, currColorVec, 3, showLabels = 0, covType = covType)
 
         fig_atlas.tight_layout()
 
@@ -228,7 +229,6 @@ def path3DMapping(covMatlist, NetworkDataGeneral, CoM_TAU, pathNames_TAU, Marker
         
     comb_img = cropImg6(imglist)
     comb_img.save(outputDir + f'/FTD{suffix_M}.png')
-
 ####################################################################################################################################################
 
 

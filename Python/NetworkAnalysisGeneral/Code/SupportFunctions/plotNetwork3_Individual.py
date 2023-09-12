@@ -152,7 +152,7 @@ def plotNetwork3Individual(currFig, adjMtx, GIImesh, CoM, LabelNames, cRange, Ma
 
         # Plot the 3D Brain surface (Atlas)
         # def plotgiiSurf(giiSurf, valDisp, viewA, viewE, CRange, flipCmap, cmapType, currAx, cmapIn=None):
-        # plotgiiSurf(GIImesh['giiSurface_Both'][0,0], surfvalDisp, viewE, viewA, viewR, cRange, 0, 5, currAx, atlasTransparency)
+        plotgiiSurf(GIImesh['giiSurface_Both'][0,0], surfvalDisp, viewE, viewA, viewR, cRange, 0, 5, currAx, atlasTransparency)
         
         # ----------TESTING----------
         # break

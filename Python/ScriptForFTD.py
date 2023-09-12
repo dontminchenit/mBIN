@@ -52,10 +52,10 @@ print('PATH START')
 LabelNames_Path, TAU_missing_index_GM, TDP_missing_index_GM, TAU_missing_index_WM, TDP_missing_index_WM = pathCovFTD(outputDir, NetworkDataGeneral, pathCoM, pathT_GM, pathT_WM, plotON = True)
 print('PATH DONE') 
 
-# # Thickness Analysis
-# print('THICKNESS START')
-# thicknessCovFTD(NetworkDataGeneral, pathLUT, HCResults, PatientTAUResults, PatientTDPResults, outputDir, plotON = True)
-# print('THICKNESS DONE')
+# Thickness Analysis 
+print('THICKNESS START')
+thicknessCovFTD(NetworkDataGeneral, pathLUT, HCResults, PatientTAUResults, PatientTDPResults, outputDir, plotON = True)
+print('THICKNESS DONE')
 
 # # # LabelNames_Path = ['ANG_L', 'ATC_L', 'HIP_L', 'IFC_L', 'M1_L', 'MFC_L', 'OFC_L', 'PC_L', 'S1_L', 'SMTC_L', 'SPC_L', 'V1_L', 'aCING_L', 'aINS_L', 'aITC_L', 'dlPFC_L', 'iPFC_L', 'mPFC_L', 'pCING_L', 'pSTC_L', 'ANG_R', 'ATC_R', 'HIP_R', 'IFC_R', 'M1_R', 'MFC_R', 'OFC_R', 'PC_R', 'S1_R', 'SMTC_R', 'SPC_R', 'V1_R', 'aCING_R', 'aINS_R', 'aITC_R', 'dlPFC_R', 'iPFC_R', 'mPFC_R', 'pCING_R', 'pSTC_R']
 # # Thickness Values Matching Pahtology Regions Analysis
