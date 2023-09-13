@@ -41,8 +41,9 @@ Open [Directory Path Setup.ipynb] and set directory paths.
 Go to [Load_Dataset](./FTD_JupyterNotebook/Load_Dataset) directory and run the notebooks. This will fetch the raw data from your local computer and format the data for analysis. 
 Formatted Data would be saved to [Data](./FTD_JupyterNotebook/Data) directory.
 ### Step 3
-Go to [Pathology_Analysis](./FTD_JupyterNotebook/Pathology_Analysis) direcotry to run experiments for Pathology Data.
+Go to [Pathology_Analysis](./FTD_JupyterNotebook/Pathology_Analysis) directory to run experiments for Pathology Data.
 Run the notebooks in order (numbered [1], [2], ...) since it would save the calculated data into [Calculated_Data](./FTD_JupyterNotebook/Pathology_Analysis/Calculated_Data).
 The figures generated from experiments would be saved into [Figures](./FTD_JupyterNotebook/Pathology_Analysis/Figures)
+Here you can add new experiments on separate notebook. 
 ### Step 4
 This is similary applied to [Thickness_Analysis](./FTD_JupyterNotebook/Thickness_Analysis) and [Thickness_At_Pathology_Analysis](./FTD_JupyterNotebook/Thickness_At_Pathology_Analysis)
