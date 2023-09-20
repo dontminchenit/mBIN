@@ -84,7 +84,7 @@ def nodeMapping(NetworkDataGeneral, pathCoM, labelNames, markerVec, colorVec, ou
         # Plot the Labels
         if showLabels:
             for i in range(len(labelNames)):
-                currAx.text(x=pathCoM[:,0][i], y=pathCoM[:,1][i], z=pathCoM[:,2][i], s=labelNames[i], fontsize = 6)
+                currAx.text(x=pathCoM[:,0][i], y=pathCoM[:,1][i], z=pathCoM[:,2][i], s=labelNames[i], fontsize = 4)
         else:
             pass
 
