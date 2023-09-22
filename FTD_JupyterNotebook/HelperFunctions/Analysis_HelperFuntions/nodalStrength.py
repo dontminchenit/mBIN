@@ -7,7 +7,7 @@ import seaborn as sns
 from PIL import Image
 
 # Correlation between Nodal Strength vs Actual Value
-def nonZeroDegCorr(DataX, covMatX, title, x_label, y_label, outputDir, outputName, linear_regression = False):
+def nonZeroDegCorr(DataX, covMatX, ymin, ymax, title, x_label, y_label, outputDir, outputName, linear_regression = False):
     
     # Copy the Covariance Matrix and set negative values as zero
     covMatXnz = covMatX.copy()
@@ -26,6 +26,9 @@ def nonZeroDegCorr(DataX, covMatX, title, x_label, y_label, outputDir, outputNam
     # Draw Scatter Plot / empty circle with blue edges
     plt.scatter(degX, np.nanmean(DataX, axis=0), facecolors='none', edgecolors='b')
    
+    # set xaxes range
+    plt.ylim(ymin, ymax)
+    
     # Get r and p-value
     r, p = scipy.stats.pearsonr(degX, np.nanmean(DataX, axis=0))
  
