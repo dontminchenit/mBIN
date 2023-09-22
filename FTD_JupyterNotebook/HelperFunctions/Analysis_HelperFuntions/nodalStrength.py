@@ -52,6 +52,80 @@ def nonZeroDegCorr(DataX, covMatX, ymin, ymax, title, x_label, y_label, outputDi
     
     # Show Figure
     plt.show()
+
+def nonZeroDegCorrCloseFar(DataX, covMatX, close_connection_list, 
+                           ymin, ymax, title, x_label, y_label, 
+                           outputDir, outputName, linear_regression = False):
+    
+    # Copy the Covariance Matrix and set negative values as zero
+    covMatXnz = covMatX.copy()
+    covMatXnz[covMatXnz < 0] = 0
+    
+    # Get sum of covariance values for all regions respective to each region
+    # Similar to computing the degree of nodes in a Network
+    degX = np.sum(covMatXnz, axis=0, where=~np.isnan(covMatXnz)) 
+    
+    # Divide the Covariance Matrix to Close and Far
+    deg_close_array = []
+    for i in range(covMatXnz.shape[1]): # For each column in array
+        # Get the column
+        col = covMatXnz[:, i]
+
+        # Get the Close indices for that col (region)
+        close_ind = close_connection_list[i]
+
+        # Get the Degree for Close
+        deg_close = np.nansum(col[close_ind])
+        deg_close_array.append(deg_close)
+
+    # Convert Deg Close to numpy
+    deg_close = np.array(deg_close_array)
+    
+    # Get Deg Far
+    deg_far = degX - deg_close_array
+    
+    # Define figure
+    fig = plt.figure()
+    
+    # Figure size
+    plt.figure(figsize=(3.5,8))
+
+    # Draw Scatter Plot 
+    # Close - empty circle with green edges
+    plt.scatter(deg_close, np.nanmean(DataX, axis=0), facecolors='none', edgecolors='orange')
+    # Far - empty circle with blue edges
+    plt.scatter(deg_far, np.nanmean(DataX, axis=0), facecolors='none', edgecolors='blue')
+    # set yaxis range
+    plt.ylim(ymin, ymax)
+    
+    
+    
+    # Get r and p-value
+    r_close, p_close = scipy.stats.pearsonr(deg_close, np.nanmean(DataX, axis=0))
+    r_far, p_far = scipy.stats.pearsonr(deg_far, np.nanmean(DataX, axis=0))
+ 
+    # Set title
+    plt.title(title + f",Close: r={r_close:.6f}, p={p_close:.6f}/Far: r={r_far:.6f}, p={p_far:.6f}", fontsize=6)
+   
+    # Draw Linear Regression Line (is set to True)
+    if linear_regression:
+        # Obtain m (slope) and b(intercept) of linear regression line
+        m_close, b_close = np.polyfit(deg_close, np.nanmean(DataX, axis=0), 1)
+        m_far, b_far = np.polyfit(deg_far, np.nanmean(DataX, axis=0), 1)
+        
+        #add linear regression line to scatterplot 
+        plt.plot(deg_close, m_close*deg_close+b_close, color="red")
+        plt.plot(deg_far, m_far*deg_far+b_far, color="green")
+
+    # Set X and Y Labels
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+
+    # Save Figure
+    plt.savefig(os.path.join(outputDir, outputName) + '.png', dpi=400)
+    
+    # Show Figure
+    plt.show()
     
 # Compare Distribution(Boxplot) of Nodal Strength Between HC, TAU, and TDP
 def nodalStrengthDist(covMatA, covMatB, covMatC, x_label, y_label, title, outputDir, outputName):
@@ -90,3 +164,82 @@ def nodalStrengthDist(covMatA, covMatB, covMatC, x_label, y_label, title, output
 
     # save figure
     fig.savefig(os.path.join(outputDir, outputName), dpi=400, format='png')
+
+    
+    
+    
+    
+#--------------------
+def nonZeroDegCorrCloseFarInv(DataX, covMatX, close_connection_list, 
+                           ymin, ymax, title, x_label, y_label, 
+                           outputDir, outputName, linear_regression = False):
+    
+    # Copy the Covariance Matrix and set negative values as zero
+    covMatXnz = covMatX.copy()
+    covMatXnz[covMatXnz < 0] = 0
+    
+    # Get sum of covariance values for all regions respective to each region
+    # Similar to computing the degree of nodes in a Network
+    degX = np.sum(covMatXnz, axis=0, where=~np.isnan(covMatXnz)) 
+    
+    # Divide the Covariance Matrix to Close and Far
+    deg_close_array = []
+    for i in range(covMatXnz.shape[1]): # For each column in array
+        # Get the column
+        col = covMatXnz[:, i]
+
+        # Get the Close indices for that col (region)
+        close_ind = close_connection_list[i]
+
+        # Get the Degree for Close
+        deg_close = np.nansum(col[close_ind])
+        deg_close_array.append(deg_close)
+
+    # Convert Deg Close to numpy
+    deg_close = np.array(deg_close_array)
+    
+    # Get Deg Far
+    deg_far = degX - deg_close_array
+    
+    # Define figure
+    fig = plt.figure()
+    
+    # Figure size
+    #plt.figure(figsize=(3.5,8))
+
+    # Draw Scatter Plot 
+    # Close - empty circle with green edges
+    plt.scatter(np.nanmean(DataX, axis=0), deg_close, facecolors='none', edgecolors='orange')
+    # Far - empty circle with blue edges
+    plt.scatter(np.nanmean(DataX, axis=0), deg_far, facecolors='none', edgecolors='blue')
+    # set yaxis range
+    plt.xlim(ymin, ymax)
+    
+    
+    
+    # Get r and p-value
+    r_close, p_close = scipy.stats.pearsonr(np.nanmean(DataX, axis=0), deg_close)
+    r_far, p_far = scipy.stats.pearsonr(np.nanmean(DataX, axis=0), deg_far)
+ 
+    # Set title
+    plt.title(title + f",Close: r={r_close:.6f}, p={p_close:.6f}/Far: r={r_far:.6f}, p={p_far:.6f}", fontsize=6)
+   
+    # Draw Linear Regression Line (is set to True)
+    if linear_regression:
+        # Obtain m (slope) and b(intercept) of linear regression line
+        m_close, b_close = np.polyfit(np.nanmean(DataX, axis=0), deg_close, 1)
+        m_far, b_far = np.polyfit(np.nanmean(DataX, axis=0), deg_far, 1)
+        
+        #add linear regression line to scatterplot 
+        plt.plot(np.nanmean(DataX, axis=0), m_close*np.nanmean(DataX, axis=0)+b_close, color="red")
+        plt.plot(np.nanmean(DataX, axis=0), m_far*np.nanmean(DataX, axis=0)+b_far, color="green")
+
+    # Set X and Y Labels
+    plt.ylabel(x_label)
+    plt.xlabel(y_label)
+
+    # Save Figure
+    plt.savefig(os.path.join(outputDir, outputName) + '.png', dpi=400)
+    
+    # Show Figure
+    plt.show()
