@@ -55,7 +55,7 @@ def nonZeroDegCorr(DataX, covMatX, ymin, ymax, title, x_label, y_label, outputDi
 
 def nonZeroDegCorrCloseFar(DataX, covMatX, close_connection_list, 
                            ymin, ymax, title, x_label, y_label, 
-                           outputDir, outputName, linear_regression = False):
+                           outputDir, outputName, linear_regression = False, savefig=True):
     
     # Copy the Covariance Matrix and set negative values as zero
     covMatXnz = covMatX.copy()
@@ -98,8 +98,6 @@ def nonZeroDegCorrCloseFar(DataX, covMatX, close_connection_list,
     # set yaxis range
     plt.ylim(ymin, ymax)
     
-    
-    
     # Get r and p-value
     r_close, p_close = scipy.stats.pearsonr(deg_close, np.nanmean(DataX, axis=0))
     r_far, p_far = scipy.stats.pearsonr(deg_far, np.nanmean(DataX, axis=0))
@@ -120,9 +118,10 @@ def nonZeroDegCorrCloseFar(DataX, covMatX, close_connection_list,
     # Set X and Y Labels
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-
-    # Save Figure
-    plt.savefig(os.path.join(outputDir, outputName) + '.png', dpi=400)
+    
+    if savefig:
+        # Save Figure
+        plt.savefig(os.path.join(outputDir, outputName) + '.png', dpi=400)
     
     # Show Figure
     plt.show()
