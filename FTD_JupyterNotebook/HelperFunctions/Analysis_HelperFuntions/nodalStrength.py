@@ -84,6 +84,14 @@ def nonZeroDegCorrCloseFar(DataX, covMatX, close_connection_list,
     # Get Deg Far
     deg_far = degX - deg_close_array
     
+    # Normalize the Degree Sum (Due to difference in number of nodes that is close vs far)
+    # Get Number of Close/Far Nodes
+    closeNum = [len(sublist) for sublist in close_connection_list]
+    farNum = (np.zeros((len(close_connection_list), ), dtype=int) + len(close_connection_list)) - closeNum
+    
+    deg_close = deg_close/closeNum
+    deg_far = deg_far/farNum
+    
     # Define figure
     fig = plt.figure()
     

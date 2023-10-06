@@ -3,14 +3,36 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from PIL import Image
 from mpl_toolkits.mplot3d import Axes3D
+from scipy.spatial import Delaunay
 
 import os
 import pickle
 import sys
 
+def save3DGraph(adjMtx, outputDir, filename):
+    """save Graph as obj that we are mapping to 3D
 
-def atlasMapping(NetworkDataGeneral, covMat, pathCoM, labelNames, markerVec, colorVec, outputDir, title, covType='original',
-                 nodeTransparency = 0.3, edgeTransparency = 0.8, atlasTransparency = 0.01, showLabels = 1, surfDisp=None):
+    Args:
+        adjMtx (ndarray): adjacency matrix we use to generate the Graph obj
+        outputDir (str): Path location to save the analysis results
+        filename (str): Name of the file we are saving
+    """
+    # Substitute NaN values to 0
+    adjMtx[np.isnan(adjMtx)] = 0
+
+    # Get upper triangle of adjMtx
+    adjMtx = np.triu(adjMtx)
+
+    # Get graph of adjMtx
+    G = nx.Graph(adjMtx)
+
+    # save graph object to file
+    pickle.dump(G, open(outputDir + '/' + filename + '.pickle', 'wb'))
+    
+
+def atlasMapping(NetworkDataGeneral, covMat, pathCoM, labelNames, markerVec, colorVec, outputDir, title,
+                 covType='original', nodeTransparency = 0.3, edgeTransparency = 0.8, atlasTransparency = 0.01, 
+                 showLabels = 1, surfDisp=None):
 
     # Define figure
     fig = plt.figure()
@@ -141,9 +163,6 @@ def atlasMapping(NetworkDataGeneral, covMat, pathCoM, labelNames, markerVec, col
  
     # plt.axis('off') # Get rid of grid and also ticks - Only get rid of grid for 2nd row
     plt.axis('equal')
-
-#     # Save Graph Object
-#     save3DGraph(covMatlist[j], graphDir, covMatNamelist[j] + suffix_M)
 
     # Save the figure
     plt.savefig(outputDir + '/' + title, dpi=1000, bbox_inches='tight')
