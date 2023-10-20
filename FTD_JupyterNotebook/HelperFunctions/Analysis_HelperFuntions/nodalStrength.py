@@ -5,6 +5,7 @@ import os
 from scipy import stats
 import seaborn as sns
 from PIL import Image
+import textwrap
 
 # Correlation between Nodal Strength vs Actual Value
 def nonZeroDegCorr(DataX, covMatX, ymin, ymax, title, x_label, y_label, outputDir, outputName, linear_regression = False):
@@ -110,9 +111,15 @@ def nonZeroDegCorrCloseFar(DataX, covMatX, close_connection_list,
     r_close, p_close = scipy.stats.pearsonr(deg_close, np.nanmean(DataX, axis=0))
     r_far, p_far = scipy.stats.pearsonr(deg_far, np.nanmean(DataX, axis=0))
  
-    # Set title
-    plt.title(title + f",Close: r={r_close:.6f}, p={p_close:.6f}/Far: r={r_far:.6f}, p={p_far:.6f}", fontsize=6)
-   
+    # Set title 
+    plt.title(textwrap.fill(title, width=60), fontsize=6)
+    
+    # Set Statistic Description
+    description_text_close = f"Close: r={r_close:.6f}, p={p_close:.6f}"
+    description_text_far = f"Far: r={r_far:.6f}, p={p_far:.6f}"
+    plt.text(0.5, -0.10, description_text_close, ha='center', va='center', transform=plt.gca().transAxes)
+    plt.text(0.5, -0.12, description_text_far, ha='center', va='center', transform=plt.gca().transAxes)
+
     # Draw Linear Regression Line (is set to True)
     if linear_regression:
         # Obtain m (slope) and b(intercept) of linear regression line
@@ -132,7 +139,7 @@ def nonZeroDegCorrCloseFar(DataX, covMatX, close_connection_list,
         plt.savefig(os.path.join(outputDir, outputName) + '.png', dpi=400)
     
     # Show Figure
-    plt.show()
+    plt.show()    
     
 # Compare Distribution(Boxplot) of Nodal Strength Between HC, TAU, and TDP
 def nodalStrengthDist(covMatA, covMatB, covMatC, x_label, y_label, title, outputDir, outputName):
