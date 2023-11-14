@@ -130,7 +130,7 @@ def atlasMapping(NetworkDataGeneral, covMat, pathCoM, labelNames, markerVec, col
             if covType == 'original':
                 colors = plt.cm.jet(edge_colors[i]) # jet color / Already color map is between 0 and 1 so no need for cRange
             if covType == 'sig':
-                colors = 'royalblue'
+                colors = 'green'
             currAx.plot(*vizedge.T, c=colors, alpha = edgeTransparency)
 
         # Plot the Labels
