@@ -161,6 +161,40 @@ def covCalSigXYRaw(x, y, covMatX, covMatY, cov_thresh):
 
     return covMatXgtYRaw, covMatYgtXRaw                
       
+def calCovMatDict(dataHC, dataTAU, dataTDP, pthresh, cov_thresh):
+    cov_dict = {}
+    
+    covMatHC = covCal(dataHC, dataHC, cov_thresh)
+    covMatTAU = covCal(dataTAU, dataTAU, cov_thresh)
+    covMatTDP = covCal(dataTDP, dataTDP, cov_thresh)
+    
+    cmpCovTAU_gt_TDP, cmpCovTDP_gt_TAU = covCalSigXY(dataTAU, dataTDP, covMatTAU, covMatTDP, pthresh, cov_thresh)
+    cmpCovTAU_gt_HC, cmpCovTAU_lt_HC = covCalSigXY(dataTAU, dataHC, covMatTAU, covMatHC, pthresh, cov_thresh)
+    cmpCovTDP_gt_HC, cmpCovTDP_lt_HC = covCalSigXY(dataTDP, dataHC, covMatTDP, covMatHC, pthresh, cov_thresh)
+    
+    cmpCovTAU_gt_TDP_raw, cmpCovTDP_gt_TAU_raw = covCalSigXYRaw(dataTAU, dataTDP, covMatTAU, covMatTDP, cov_thresh)
+    cmpCovTAU_gt_HC_raw, cmpCovTAU_lt_HC_raw = covCalSigXYRaw(dataTAU, dataHC, covMatTAU, covMatHC, cov_thresh)
+    cmpCovTDP_gt_HC_raw, cmpCovTDP_lt_HC_raw = covCalSigXYRaw(dataTDP, dataHC, covMatTDP, covMatHC, cov_thresh)
+    
+    cov_dict["HC"] = covMatHC
+    cov_dict["TAU"] = covMatTAU
+    cov_dict["TDP"] = covMatTDP
+    
+    cov_dict["TAU_gt_TDP"] = cmpCovTAU_gt_TDP
+    cov_dict["TDP_gt_TAU"] = cmpCovTDP_gt_TAU
+    cov_dict["TAU_gt_HC"] = cmpCovTAU_gt_HC
+    cov_dict["TAU_lt_HC"] = cmpCovTAU_lt_HC
+    cov_dict["TDP_gt_HC"] = cmpCovTDP_gt_HC
+    cov_dict["TDP_lt_HC"] = cmpCovTDP_lt_HC
+    
+    cov_dict["TAU_gt_TDP_raw"] = cmpCovTAU_gt_TDP_raw
+    cov_dict["TDP_gt_TAU_raw"] = cmpCovTDP_gt_TAU_raw
+    cov_dict["TAU_gt_HC_raw"] = cmpCovTAU_gt_HC_raw
+    cov_dict["TAU_lt_HC_raw"] = cmpCovTAU_lt_HC_raw
+    cov_dict["TDP_gt_HC_raw"] = cmpCovTDP_gt_HC_raw
+    cov_dict["TDP_lt_HC_raw"] = cmpCovTDP_lt_HC_raw
+    
+    return cov_dict
                 
                 
                 
