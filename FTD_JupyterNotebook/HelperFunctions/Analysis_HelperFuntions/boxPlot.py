@@ -9,9 +9,9 @@ from PIL import Image
 def drawthicknessboxplot(HCData, TAUData, TDPData, x_label, y_label, title, outputDir, outputName):
     # HCData, TAUData, TDPData --> Shape N x 400
     # Get Mean for each Regions
-    HC_Mean = np.mean(HCData, axis=0)
-    TAU_Mean = np.mean(TAUData, axis=0)
-    TDP_Mean = np.mean(TDPData, axis=0)
+    HC_Mean = np.nanmean(HCData, axis=0)
+    TAU_Mean = np.nanmean(TAUData, axis=0)
+    TDP_Mean = np.nanmean(TDPData, axis=0)
 
     # Define data
     data = [HC_Mean, TAU_Mean, TDP_Mean]
@@ -20,7 +20,7 @@ def drawthicknessboxplot(HCData, TAUData, TDPData, x_label, y_label, title, outp
     fig, ax = plt.subplots()
 
     # Draw the boxplots with x_label and y_label
-    bplot = ax.boxplot(data, notch=True, labels=x_label)
+    bplot = ax.boxplot(data, notch=False, labels=x_label)
     ax.set_ylabel(y_label)
 
     # perform t-test

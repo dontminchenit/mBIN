@@ -110,9 +110,18 @@ def generateWScore(hcCov, tauCov, tdpCov, N, HCData, TAUData, TDPData):
     for k in range(N): 
         yHC = HCData[:,k] # Thickness values of specified region for HC (54,)
         assert(yHC.shape == (HCData.shape[0],))
-    
+        
+        # Remove NaNs for Linear Regression
+        # Identify indices of non-NaN values in yHC
+        non_nan_indices = ~np.isnan(yHC)
+        # Remove NaN values from yHC
+        no_nan_yHC = yHC[non_nan_indices]
+
+        # Remove corresponding rows from hcCov
+        no_nan_hcCov = hcCov[non_nan_indices]
+        
         # Linear Regression
-        regHC = LinearRegression().fit(hcCov, yHC)
+        regHC = LinearRegression().fit(no_nan_hcCov, no_nan_yHC)
 
         # Predict 
         HC_Predict = regHC.predict(hcCov) # Shape (54, ) --> Thickness values for 54 subject in specified Region
