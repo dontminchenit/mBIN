@@ -254,6 +254,17 @@ def circularPlot(covMat, data_label, labels_dict, order, colordict, figTitle, fi
 
     # Title
     fig.suptitle(figTitle, fontsize=16)
+    
+    value_list = []
+    for text in legend_text:
+        val = float(text.split(':')[-1])
+        value_list.append(val)
+    
+    value_list = np.array(value_list)
+    
+    # Add mean and std
+    legend_text.append(f"Mean: {np.mean(value_list)}")
+    legend_text.append(f"Std: {np.std(value_list)}")
 
 #     plt.legend(legend_text, loc='upper right', handlelength=0, bbox_to_anchor=(1.5, 1.5))
     for i, line in enumerate(legend_text):
