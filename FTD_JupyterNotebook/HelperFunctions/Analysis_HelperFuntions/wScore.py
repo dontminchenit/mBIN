@@ -103,14 +103,15 @@ def generateWScore(hcCov, tauCov, tdpCov, N, HCData, TAUData, TDPData):
         TDP_w (float): TDP W Score
     """
     
-    HC_model_list = [] # (400,) 
-    HC_residuals_std_list = [] # (400,)  
+    HC_model_list = [] # (N,) 
+    HC_residuals_std_list = [] # (N,)  
 
-    # Linear regression on HC for ALL 400 Regions
+    # Linear regression on HC for ALL N Regions
     for k in range(N): 
-        yHC = HCData[:,k] # Thickness values of specified region for HC (54,)
+        yHC = HCData[:,k] # Number of Subjects
+
         assert(yHC.shape == (HCData.shape[0],))
-        
+
         # Remove NaNs for Linear Regression
         # Identify indices of non-NaN values in yHC
         non_nan_indices = ~np.isnan(yHC)
@@ -119,12 +120,16 @@ def generateWScore(hcCov, tauCov, tdpCov, N, HCData, TAUData, TDPData):
 
         # Remove corresponding rows from hcCov
         no_nan_hcCov = hcCov[non_nan_indices]
-        
+
         # Linear Regression
         regHC = LinearRegression().fit(no_nan_hcCov, no_nan_yHC)
 
-        # Predict 
-        HC_Predict = regHC.predict(hcCov) # Shape (54, ) --> Thickness values for 54 subject in specified Region
+        # Predict - non NaNs
+        non_nan_HC_Predict = regHC.predict(no_nan_hcCov) # Shape (54, ) --> Thickness values for 54 subject in specified Region
+
+        # Add NaNs back into non_nan_HC_Predict at the indices where yHC was NaN
+        HC_Predict = np.full(yHC.shape, np.nan)
+        HC_Predict[non_nan_indices] = non_nan_HC_Predict
         assert(HC_Predict.shape == (HCData.shape[0],))
 
         # Residual
@@ -147,17 +152,26 @@ def generateWScore(hcCov, tauCov, tdpCov, N, HCData, TAUData, TDPData):
     HC_Predicted = np.empty(HCData.shape) # (54, 400) 
     for h in range(HCData.shape[0]): # 54
         for g in range (HCData.shape[1]): # 400 or 40
-            HC_Predicted[h, g] = HC_model_list[g].predict([hcCov[h]])
+            if np.isnan(hcCov[h]).any(): # If there is NaN
+                HC_Predicted[h, g] = np.nan
+            else:
+                HC_Predicted[h, g] = HC_model_list[g].predict(hcCov[h].reshape(1, -1))
 
     TAU_Predicted = np.empty(TAUData.shape) # (26, 400)
     for h in range(TAUData.shape[0]): # 26
         for g in range (TAUData.shape[1]): # 400 or 35
-            TAU_Predicted[h, g] = HC_model_list[g].predict([tauCov[h]])
+            if np.isnan(tauCov[h]).any(): # If there is NaN
+                TAU_Predicted[h, g] = np.nan
+            else:
+                TAU_Predicted[h, g] = HC_model_list[g].predict(tauCov[h].reshape(1, -1))
 
     TDP_Predicted = np.empty(TDPData.shape) # (30, 400) 
     for h in range(TDPData.shape[0]): # 30
         for g in range (TDPData.shape[1]): # 400 or 35
-            TDP_Predicted[h, g] = HC_model_list[g].predict([tdpCov[h]])
+            if np.isnan(tdpCov[h]).any(): # If there is NaN
+                TDP_Predicted[h, g] = np.nan
+            else:
+                TDP_Predicted[h, g] = HC_model_list[g].predict(tdpCov[h].reshape(1, -1))
 
     # Compute W Score
     HC_w = np.empty(HCData.shape) # 54 x 400
@@ -174,3 +188,4 @@ def generateWScore(hcCov, tauCov, tdpCov, N, HCData, TAUData, TDPData):
         TDP_w[i, :] = (TDPData[i, :] - TDP_Predicted[i, :]) / HC_residuals_std_list
 
     return HC_w, TAU_w, TDP_w
+
