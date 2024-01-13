@@ -164,7 +164,10 @@ def atlasMapping(NetworkDataGeneral, covMat, pathCoM, labelNames, markerVec, col
  
     # plt.axis('off') # Get rid of grid and also ticks - Only get rid of grid for 2nd row
     plt.axis('equal')
-
+    
+    # Set title 
+    plt.suptitle(title)
+    
     # Save the figure
     plt.savefig(outputDir + '/' + title, dpi=1000, bbox_inches='tight')
     
