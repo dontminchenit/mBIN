@@ -128,7 +128,8 @@ def atlasMapping(NetworkDataGeneral, covMat, pathCoM, labelNames, markerVec, col
         # Plot the edges
         for i, vizedge in enumerate(edge_xyz):
             if covType == 'original':
-                colors = plt.cm.jet(edge_colors[i]) # jet color / Already color map is between 0 and 1 so no need for cRange
+                #colors = plt.cm.jet(edge_colors[i]) # jet color / Already color map is between 0 and 1 so no need for cRange
+                colors = plt.cm.coolwarm(edge_colors[i]) # jet color / Already color map is between 0 and 1 so no need for cRange
             if covType == 'sig':
 #                 colors = 'green'
                 colors = 'royalblue'
