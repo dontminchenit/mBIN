@@ -20,7 +20,7 @@ def drawCovMatrix(covMat, x_labels, y_labels, title, outputDir, annot_fontsize =
     cmap = sns.color_palette("coolwarm", as_cmap=True)
     
     # Draw the heatmap with the mask and correct aspect ratio
-    sns.heatmap(covMat, mask=mask, cmap=cmap, vmax=1, vmin=0, center=0.5,
+    sns.heatmap(covMat, mask=mask, cmap=cmap, vmax=1, vmin=-1, center=0,
                 square=True, linewidths=.5, xticklabels=x_labels, yticklabels=y_labels, cbar_kws={"shrink": .5}, 
                 annot=annot_bool, annot_kws={"size": annot_fontsize}, fmt='.2f')
     
