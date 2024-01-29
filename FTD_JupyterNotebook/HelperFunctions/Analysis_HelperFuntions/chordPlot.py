@@ -21,9 +21,10 @@ def condition(source, target, name):
         cond = ((source == 'L23_2(Cingulate)') & (target == 'L56_1(Cingulate)') | 
                 (source == 'L23_3d(Paracingulate)') & (target == 'L56_2(Cingulate)') |
                 (source == 'L23_3v(Paracingulate)') & (target == 'L56_2(Cingulate)') |
-
                 (source == 'L23_3d(Paracingulate)') & (target == 'L56_1(Cingulate)') | 
                 (source == 'L23_3v(Paracingulate)') & (target == 'L56_1(Cingulate)') | 
+                (source == 'L23_5(Middle Frontal)') & (target == 'L56_4(Rectus)') | 
+
                 (source == 'L23_4(Rectus)') & (target == 'L56_1(Cingulate)') | 
                 (source == 'L23_5(Middle Frontal)') & (target == 'L56_1(Cingulate)') |
                 (source == 'L23_4(Rectus)') & (target == 'L56_2(Cingulate)') |
@@ -33,52 +34,14 @@ def condition(source, target, name):
                 (source == 'L23_5(Middle Frontal)') & (target == 'L56_3d(Paracingulate)') |
                 (source == 'L23_5(Middle Frontal)') & (target == 'L56_3v(Paracingulate)'))
 
-    elif name == 'noncanonical':
-        # long_noncanon
-        cond = ((source == 'L23_1(Cingulate)') & (target == 'L56_2(Cingulate)') | 
-                (source == 'L23_2(Cingulate)') & (target == 'L56_3d(Paracingulate)') |
-                (source == 'L23_2(Cingulate)') & (target == 'L56_3v(Paracingulate)') |
-
-                (source == 'L23_1(Cingulate)') & (target == 'L56_3d(Paracingulate)') |
-                (source == 'L23_1(Cingulate)') & (target == 'L56_3v(Paracingulate)') | 
-                (source == 'L23_1(Cingulate)') & (target == 'L56_4(Rectus)') | 
-                (source == 'L23_1(Cingulate)') & (target == 'L56_5(Middle Frontal)') |
-                (source == 'L23_2(Cingulate)') & (target == 'L56_4(Rectus)') |
-                (source == 'L23_2(Cingulate)') & (target == 'L56_5(Middle Frontal)') |
-                (source == 'L23_3d(Paracingulate)') & (target == 'L56_4(Rectus)') |
-                (source == 'L23_3v(Paracingulate)') & (target == 'L56_4(Rectus)') |
-                (source == 'L23_3d(Paracingulate)') & (target == 'L56_5(Middle Frontal)') |
-                (source == 'L23_3v(Paracingulate)') & (target == 'L56_5(Middle Frontal)') | ##
-                (source == 'L23_1(Cingulate)') & (target == 'L23_3d(Paracingulate)') | 
-                (source == 'L23_1(Cingulate)') & (target == 'L23_3v(Paracingulate)') | 
-                (source == 'L23_1(Cingulate)') & (target == 'L23_4(Rectus)') | 
-                (source == 'L23_1(Cingulate)') & (target == 'L23_5(Middle Frontal)') | 
-                (source == 'L23_2(Cingulate)') & (target == 'L23_4(Rectus)') | 
-                (source == 'L23_2(Cingulate)') & (target == 'L23_5(Middle Frontal)') | 
-                (source == 'L23_3d(Paracingulate)') & (target == 'L23_4(Rectus)') |
-                (source == 'L23_3v(Paracingulate)') & (target == 'L23_4(Rectus)') | 
-                (source == 'L23_3d(Paracingulate)') & (target == 'L23_5(Middle Frontal)') |
-                (source == 'L23_3v(Paracingulate)') & (target == 'L23_5(Middle Frontal)') | ##
-                (source == 'L56_1(Cingulate)') & (target == 'L56_3d(Paracingulate)') |
-                (source == 'L56_1(Cingulate)') & (target == 'L56_3v(Paracingulate)') | 
-                (source == 'L56_1(Cingulate)') & (target == 'L56_4(Rectus)') |
-                (source == 'L56_1(Cingulate)') & (target == 'L56_5(Middle Frontal)') |
-                (source == 'L56_2(Cingulate)') & (target == 'L56_4(Rectus)') |
-                (source == 'L56_2(Cingulate)') & (target == 'L56_5(Middle Frontal)') |
-                (source == 'L56_3d(Paracingulate)') & (target == 'L56_4(Rectus)') |
-                (source == 'L56_3v(Paracingulate)') & (target == 'L56_4(Rectus)') |
-                (source == 'L56_3d(Paracingulate)') & (target == 'L56_5(Middle Frontal)') |
-                (source == 'L56_3v(Paracingulate)') & (target == 'L56_5(Middle Frontal)')
-                )
-
     elif name == 'short':
         # short
-        cond = ((source == 'L23_1(Cingulate)') & (target == 'L23_2(Cingulate)') | 
-                (source == 'L23_2(Cingulate)') & (target == 'L23_3d(Paracingulate)') |
-                (source == 'L23_2(Cingulate)') & (target == 'L23_3v(Paracingulate)') |
+        cond = ((source == 'L23_2(Cingulate)') & (target == 'L23_3d(Paracingulate)') |
+                (source == 'L23_1(Cingulate)') & (target == 'L23_2(Cingulate)') | 
+                (source == 'L23_3v(Paracingulate)') & (target == 'L23_4(Rectus)') |
                 (source == 'L56_1(Cingulate)') & (target == 'L56_2(Cingulate)') |
                 (source == 'L56_2(Cingulate)') & (target == 'L56_3d(Paracingulate)') |
-                (source == 'L56_2(Cingulate)') & (target == 'L56_3v(Paracingulate)') |
+                (source == 'L56_3v(Paracingulate)') & (target == 'L56_4(Rectus)') | 
                 
                 (source == 'L23_1(Cingulate)') & (target == 'L56_1(Cingulate)') | 
                 (source == 'L23_2(Cingulate)') & (target == 'L56_2(Cingulate)') | 
@@ -87,6 +50,56 @@ def condition(source, target, name):
                 (source == 'L23_4(Rectus)') & (target == 'L56_4(Rectus)') | 
                 (source == 'L23_5(Middle Frontal)') & (target == 'L56_5(Middle Frontal)'))
 
+    elif name == 'noncanonical':
+        # long_noncanon
+        cond = ((source == 'L23_1(Cingulate)') & (target == 'L56_2(Cingulate)') |
+                (source == 'L23_1(Cingulate)') & (target == 'L23_3d(Paracingulate)') |
+                (source == 'L23_1(Cingulate)') & (target == 'L23_3v(Paracingulate)') |
+                (source == 'L23_1(Cingulate)') & (target == 'L23_4(Rectus)') |
+                (source == 'L23_1(Cingulate)') & (target == 'L23_5(Middle Frontal)') |
+                (source == 'L23_1(Cingulate)') & (target == 'L56_3d(Paracingulate)') |
+                (source == 'L23_1(Cingulate)') & (target == 'L56_3v(Paracingulate)') |
+                (source == 'L23_1(Cingulate)') & (target == 'L56_4(Rectus)') |
+                (source == 'L23_1(Cingulate)') & (target == 'L56_5(Middle Frontal)') |
+
+                (source == 'L23_2(Cingulate)') & (target == 'L56_3d(Paracingulate)') |
+                (source == 'L23_2(Cingulate)') & (target == 'L56_3v(Paracingulate)') |
+                (source == 'L23_2(Cingulate)') & (target == 'L23_4(Rectus)') |
+                (source == 'L23_2(Cingulate)') & (target == 'L23_5(Middle Frontal)') |
+                (source == 'L23_2(Cingulate)') & (target == 'L56_4(Rectus)') |
+                (source == 'L23_2(Cingulate)') & (target == 'L56_5(Middle Frontal)') |
+                (source == 'L23_2(Cingulate)') & (target == 'L23_3v(Paracingulate)') |
+
+                (source == 'L23_3d(Paracingulate)') & (target == 'L23_4(Rectus)') |
+                (source == 'L23_3d(Paracingulate)') & (target == 'L23_5(Middle Frontal)') |
+                (source == 'L23_3d(Paracingulate)') & (target == 'L56_4(Rectus)') |
+                (source == 'L23_3d(Paracingulate)') & (target == 'L56_5(Middle Frontal)') |
+                (source == 'L23_3d(Paracingulate)') & (target == 'L56_3v(Paracingulate)') |
+
+                (source == 'L23_3v(Paracingulate)') & (target == 'L23_5(Middle Frontal)') |
+                (source == 'L23_3v(Paracingulate)') & (target == 'L56_4(Rectus)') |
+                (source == 'L23_3v(Paracingulate)') & (target == 'L56_5(Middle Frontal)') |
+                (source == 'L23_3v(Paracingulate)') & (target == 'L56_3d(Paracingulate)') |
+                
+                (source == 'L23_4(Rectus)') & (target == 'L23_5(Middle Frontal)') |
+                (source == 'L23_4(Rectus)') & (target == 'L56_5(Middle Frontal)') |
+
+                (source == 'L56_1(Cingulate)') & (target == 'L56_3d(Paracingulate)') |
+                (source == 'L56_1(Cingulate)') & (target == 'L56_3v(Paracingulate)') |
+                (source == 'L56_1(Cingulate)') & (target == 'L56_4(Rectus)') |
+                (source == 'L56_1(Cingulate)') & (target == 'L56_5(Middle Frontal)') |
+
+                (source == 'L56_2(Cingulate)') & (target == 'L56_4(Rectus)') |
+                (source == 'L56_2(Cingulate)') & (target == 'L56_5(Middle Frontal)') |
+                (source == 'L56_2(Cingulate)') & (target == 'L56_3v(Paracingulate)') |
+
+                (source == 'L56_3d(Paracingulate)') & (target == 'L56_5(Middle Frontal)') |
+                (source == 'L56_3d(Paracingulate)') & (target == 'L56_4(Rectus)') |
+
+                (source == 'L56_3v(Paracingulate)') & (target == 'L56_5(Middle Frontal)') |
+
+                (source == 'L56_4(Rectus)') & (target == 'L56_5(Middle Frontal)'))
+            
     else:
         raise ValueError('Condition Not Defined')
     
