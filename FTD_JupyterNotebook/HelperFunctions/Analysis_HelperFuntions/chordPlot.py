@@ -157,7 +157,7 @@ def chordPlot(covMat, data_label, figTitle, fig_type, markerVec, sub_path = Fals
         raise ValueError("node_sizes list must have the same length as the number of nodes")
 
     if fig_type == 'org':
-
+        fig, ax = plt.subplots(figsize=(13, 13))  # Your main plot
         # # Normalizing edge weights for color mapping
         # weights_normalized = (weights - np.min(weights)) / (np.max(weights) - np.min(weights))
         # colors = plt.cm.coolwarm(weights_normalized)
@@ -316,6 +316,123 @@ def chordPlotRaw(covMat, data_label, figTitle, fig_type, markerVec, sub_path = F
         # Add colorbar to the plot
         cbar = plt.colorbar(sm, ax=ax, orientation='horizontal', fraction=0.046, pad=0.04)
         cbar.set_label('P-Value Scale', rotation=0, labelpad=-70)
+        cbar.ax.xaxis.set_ticks_position('top')
+        cbar.ax.xaxis.set_label_position('top')
+
+        ax.set_title(figTitle)
+    
+    #plt.show()
+    return fig
+
+def chordPlotOrigSub(covMat, data_label, figTitle, fig_type, markerVec, sub_path = False, sub_path_type = '', ax=None):
+    # Substitute NaN values in covMat to 0
+    covMat[np.isnan(covMat)] = 0
+
+    # Get upper triangle of covMat
+    covMat = np.triu(covMat)
+
+    # Get graph of covMat
+    G = nx.Graph(covMat)
+
+    # Creating a mapping from old labels (0-11) to new labels (SMI32_Labels)
+    mapping = {old_label: new_label for old_label, new_label in zip(range(12), data_label)}
+
+    # Relabeling the nodes
+    G = nx.relabel_nodes(G, mapping)
+
+    # Orderd Positioning the nodes in a circle
+    pos = { 'L23_5(Middle Frontal)': np.array([1.00000000e+00, 1.97028653e-08]),
+            'L23_4(Rectus)': np.array([0.86602539, 0.50000001]),
+            'L23_3v(Paracingulate)': np.array([0.49999998, 0.86602545]),
+            'L23_3d(Paracingulate)': np.array([-2.36778241e-08,  1.00000000e+00]),
+            'L23_2(Cingulate)': np.array([-0.50000003,  0.86602539]),
+            'L23_1(Cingulate)': np.array([-0.86602535,  0.50000007]),
+            'L56_1(Cingulate)': np.array([-9.99999960e-01, -6.77199095e-08]),
+            'L56_2(Cingulate)': np.array([-0.86602541, -0.49999994]),
+            'L56_3d(Paracingulate)': np.array([-0.49999988, -0.86602541]),
+            'L56_3v(Paracingulate)': np.array([ 3.19584437e-08, -9.99999960e-01]),
+            'L56_4(Rectus)': np.array([ 0.49999992, -0.86602541]),
+            'L56_5(Middle Frontal)': np.array([ 0.86602533, -0.50000015])}
+
+    # Define the angle in radians for the clockwise rotation (30 degrees)
+    angle = np.radians(15)
+
+    # Perform the rotation for each position
+    rotated_pos = {}
+    for key, value in pos.items():
+        x = value[0]
+        y = value[1]
+        new_x = x * np.cos(angle) - y * np.sin(angle)
+        new_y = x * np.sin(angle) + y * np.cos(angle)
+        rotated_pos[key] = np.array([new_x, new_y])
+
+    # Drawing the graph
+    fig = plt.figure(figsize=(13, 13))
+    edges = G.edges()
+    weights = [G[u][v]['weight'] for u,v in edges]
+
+    # Ensure markerVec list is as long as the number of nodes
+    if len(markerVec) != len(G.nodes()):
+        raise ValueError("node_sizes list must have the same length as the number of nodes")
+
+
+    # Normalizing edge weights for color mapping between -1 and 1 / already in range -1 to 1
+    weights_normalized = np.array(weights)
+    colors = plt.cm.coolwarm((weights_normalized + 1) / 2)  # Rescaling to 0-1 for colormap
+
+    if fig_type == 'org':
+
+        # # Normalizing edge weights for color mapping
+        # weights_normalized = (weights - np.min(weights)) / (np.max(weights) - np.min(weights))
+        # colors = plt.cm.coolwarm(weights_normalized)
+
+
+        nx.draw_networkx_nodes(G, rotated_pos, node_color='skyblue', node_size=markerVec)
+        nx.draw_networkx_labels(G, rotated_pos)
+        nx.draw_networkx_edges(G, rotated_pos, edge_color=colors, width=3)
+
+        # Create a ScalarMappable and initialize a colorbar
+        sm = ScalarMappable(cmap=plt.cm.coolwarm, norm=plt.Normalize(vmin=-1, vmax=1))
+        sm.set_array([])  # You can also set an array of the same shape as data to be represented
+
+        # Add colorbar to the plot
+        cbar = plt.colorbar(sm, ax=ax, orientation='horizontal', fraction=0.046, pad=0.04)
+        cbar.set_label('Correlation Scale', rotation=0, labelpad=-70)
+        cbar.ax.xaxis.set_ticks_position('top')
+        cbar.ax.xaxis.set_label_position('top')
+
+        plt.title(figTitle)
+
+    elif fig_type == 'cmp':
+        # Use the provided ax for plotting instead of creating a new figure
+        plt.sca(ax)
+
+        if not sub_path: # Whole
+            nx.draw_networkx_nodes(G, rotated_pos, node_color='skyblue', node_size=markerVec)
+            nx.draw_networkx_labels(G, rotated_pos)
+            nx.draw_networkx_edges(G, rotated_pos, edge_color=colors, width=3)
+
+        else: # Subpaths
+            # Iterate through each edge to apply conditions
+            for i, (u, v, data) in enumerate(G.edges(data=True)):
+                edge_weight = data['weight']
+
+                # Apply condition - Change color and width for edges with weight above a threshold
+                if condition(u, v, sub_path_type): # Condition is met
+                    # Draw each edge individually with the color from the colormap
+                    nx.draw_networkx_edges(G, rotated_pos, edgelist=[(u, v)], width=3, edge_color=colors[i])
+
+            nx.draw_networkx_nodes(G, rotated_pos, node_color='skyblue', node_size=markerVec)
+            nx.draw_networkx_labels(G, rotated_pos)
+
+
+        # Create a ScalarMappable and initialize a colorbar
+        sm = ScalarMappable(cmap=plt.cm.coolwarm, norm=plt.Normalize(vmin=-1, vmax=1))
+        sm.set_array([])  # You can also set an array of the same shape as data to be represented
+
+        # Add colorbar to the plot
+        cbar = plt.colorbar(sm, ax=ax, orientation='horizontal', fraction=0.046, pad=0.04)
+        cbar.set_label('Significant Difference Scale', rotation=0, labelpad=-70)
         cbar.ax.xaxis.set_ticks_position('top')
         cbar.ax.xaxis.set_label_position('top')
 

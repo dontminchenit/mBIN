@@ -32,6 +32,15 @@ def save3DGraph(adjMtx, outputDir, filename):
     return G
     
 
+# atlasMapping.atlasMapping(NetworkDataGeneral, fd.fixedDensity(cov_volAtPath_w_dict_Drop['TDP_gt_TAU_raw'], fd_val), 
+#                           CoM_TDP_Drop, 
+#                           pathNames_TDP_Drop, 
+#                           markerVecVolTDP, 
+#                           colorVecVolTDP, 
+#                           thickAtPath_Fig, 'temp',
+#                           covType='sig', 
+#                           nodeTransparency = 0.3, edgeTransparency = 0.8, atlasTransparency = 0.01, showLabels = 1, surfDisp=None)
+
 def atlasMapping(NetworkDataGeneral, covMat, pathCoM, labelNames, markerVec, colorVec, outputDir, title,
                  covType='original', nodeTransparency = 0.3, edgeTransparency = 0.8, atlasTransparency = 0.01, 
                  showLabels = 1, surfDisp=None):
@@ -131,7 +140,8 @@ def atlasMapping(NetworkDataGeneral, covMat, pathCoM, labelNames, markerVec, col
         for i, vizedge in enumerate(edge_xyz):
             if covType == 'original':
                 #colors = plt.cm.jet(edge_colors[i]) # jet color / Already color map is between 0 and 1 so no need for cRange
-                colors = plt.cm.coolwarm(edge_colors[i]) # jet color / Already color map is between 0 and 1 so no need for cRange
+                # colors = plt.cm.coolwarm(edge_colors[i]) # jet color / Already color map is between 0 and 1 so no need for cRange
+                colors = plt.cm.Reds(edge_colors[i]) # jet color / Already color map is between 0 and 1 so no need for cRange
             if covType == 'sig':
 #                 colors = 'green'
                 colors = 'royalblue'
